@@ -1,8 +1,8 @@
-import React from "react";
-import { assertUnreachable, getCurrentPageUnfollowers, getMaxPage, getUsersForDisplay, isWithoutProfilePicture } from "../utils/utils";
-import { State } from "../model/state";
-import { UserNode } from "../model/user";
-import { WHITELISTED_RESULTS_STORAGE_KEY } from "../constants/constants";
+import React from 'react';
+import { assertUnreachable, getCurrentPageUsers, getMaxPage, getUsersForDisplay, isWithoutProfilePicture } from '../utils/utils';
+import { State } from '../model/state';
+import { UserNode } from '../model/user';
+import { WHITELISTED_RESULTS_STORAGE_KEY } from '../constants/constants';
 
 
 export interface SearchingProps {
@@ -26,7 +26,7 @@ export const Searching = ({
   UserCheckIcon,
   UserUncheckIcon,
 }: SearchingProps) => {
-  if (state.status !== "scanning") {
+  if (state.status !== 'scanning') {
     return null;
   }
 
@@ -37,63 +37,63 @@ export const Searching = ({
     state.searchTerm,
     state.filter,
   );
-  let currentLetter = "";
+  let currentLetter = '';
 
   const onNewLetter = (firstLetter: string) => {
     currentLetter = firstLetter;
-    return <div className="alphabet-character">{currentLetter}</div>;
+    return <div className='alphabet-character'>{currentLetter}</div>;
   };
 
   return (
-    <section className="workspace-layout">
-      <aside className="app-sidebar">
-        <div className="sidebar-content">
-          <div className="panel-heading">
-            <span>Scanner</span>
+    <section className='workspace-layout'>
+      <aside className='app-sidebar'>
+        <div className='sidebar-content'>
+          <div className='panel-heading'>
+            <span>Audit</span>
             <strong>{state.percentage}%</strong>
           </div>
-          <menu className="sidebar-filters-grid">
+          <menu className='sidebar-filters-grid'>
             <p>Filter</p>
-            <label className="badge m-small">
+            <label className='badge m-small'>
               <input
-                type="checkbox"
-                name="showNonFollowers"
+                type='checkbox'
+                name='showNonFollowers'
                 checked={state.filter.showNonFollowers}
                 onChange={handleScanFilter}
               />
               &nbsp;Non-Followers
             </label>
-            <label className="badge m-small">
+            <label className='badge m-small'>
               <input
-                type="checkbox"
-                name="showFollowers"
+                type='checkbox'
+                name='showFollowers'
                 checked={state.filter.showFollowers}
                 onChange={handleScanFilter}
               />
               &nbsp;Followers
             </label>
-            <label className="badge m-small">
+            <label className='badge m-small'>
               <input
-                type="checkbox"
-                name="showVerified"
+                type='checkbox'
+                name='showVerified'
                 checked={state.filter.showVerified}
                 onChange={handleScanFilter}
               />
               &nbsp;Verified
             </label>
-            <label className="badge m-small">
+            <label className='badge m-small'>
               <input
-                type="checkbox"
-                name="showPrivate"
+                type='checkbox'
+                name='showPrivate'
                 checked={state.filter.showPrivate}
                 onChange={handleScanFilter}
               />
               &nbsp;Private
             </label>
-            <label className="badge m-small">
+            <label className='badge m-small'>
               <input
-                type="checkbox"
-                name="showWithOutProfilePicture"
+                type='checkbox'
+                name='showWithOutProfilePicture'
                 checked={state.filter.showWithOutProfilePicture}
                 onChange={handleScanFilter}
               />
@@ -101,9 +101,9 @@ export const Searching = ({
             </label>
           </menu>
 
-          <div className="sidebar-buttons-grid">
+          <div className='sidebar-buttons-grid'>
             <button
-              className="button-secondary"
+              className='button-secondary'
               onClick={() => {
                 const verifiedUsers = usersForDisplay.filter(u => u.is_verified);
                 const currentIds = new Set(state.selectedResults.map(u => u.id));
@@ -114,7 +114,7 @@ export const Searching = ({
               Verified
             </button>
             <button
-              className="button-secondary"
+              className='button-secondary'
               onClick={() => {
                 const privateUsers = usersForDisplay.filter(u => u.is_private);
                 const currentIds = new Set(state.selectedResults.map(u => u.id));
@@ -125,7 +125,7 @@ export const Searching = ({
               Private
             </button>
             <button
-              className="button-secondary"
+              className='button-secondary'
               onClick={() => {
                 const noPicUsers = usersForDisplay.filter(u => isWithoutProfilePicture(u));
                 const currentIds = new Set(state.selectedResults.map(u => u.id));
@@ -136,48 +136,48 @@ export const Searching = ({
               No Pic
             </button>
             <button
-              className="button-secondary danger-text"
+              className='button-secondary danger-text'
               onClick={() => setState({ ...state, selectedResults: [] })}
             >
               Clear
             </button>
           </div>
-          <div className="sidebar-stats metric-stack">
+          <div className='sidebar-stats metric-stack'>
             <p><span>Displayed</span><strong>{usersForDisplay.length}</strong></p>
             <p><span>Total scanned</span><strong>{state.results.length}</strong></p>
-            <p className="whitelist-counter">
+            <p className='whitelist-counter'>
               <span>Whitelisted</span><strong>★ {state.whitelistedResults.length}</strong>
             </p>
           </div>
 
           {state.percentage === 100 && (
-            <div className="sidebar-summary">
-              <h4>Scan Summary</h4>
-              <div className="summary-grid">
-                <div className="summary-item">
+            <div className='sidebar-summary'>
+              <h4>Audit Summary</h4>
+              <div className='summary-grid'>
+                <div className='summary-item'>
                   <span>Non-Followers</span>
                   <strong>{state.results.filter(u => !u.follows_viewer).length}</strong>
                 </div>
-                <div className="summary-item">
+                <div className='summary-item'>
                   <span>Verified</span>
                   <strong>{state.results.filter(u => u.is_verified).length}</strong>
                 </div>
-                <div className="summary-item">
+                <div className='summary-item'>
                   <span>Private</span>
                   <strong>{state.results.filter(u => u.is_private).length}</strong>
                 </div>
               </div>
             </div>
           )}
-          <div className="sidebar-footer-controls">
+          <div className='sidebar-footer-controls'>
             <button
-              className="button-control button-pause"
+              className='button-control button-pause'
               onClick={pauseScan}
             >
-              {scanningPaused ? "Resume" : "Pause"}
+              {scanningPaused ? 'Resume' : 'Pause'}
             </button>
-            <div className="sidebar-pagination">
-              <div className="pagination-controls">
+            <div className='sidebar-pagination'>
+              <div className='pagination-controls'>
                 <a
                   onClick={() => {
                     if (state.page - 1 > 0) {
@@ -210,24 +210,24 @@ export const Searching = ({
           </div>
         </div>
         <button
-          className="unfollow"
+          className='unfollow'
           onClick={() => {
-            if (!confirm("Are you sure?")) {
+            if (!confirm('Are you sure?')) {
               return;
             }
-            //TODO TEMP until types are properly fixed
+            // TODO TEMP until types are properly fixed
             // @ts-ignore
             setState(prevState => {
-              if (prevState.status !== "scanning") {
+              if (prevState.status !== 'scanning') {
                 return prevState;
               }
               if (prevState.selectedResults.length === 0) {
-                alert("Must select at least a single user to unfollow");
+                alert('Select at least one account before starting an action.');
                 return prevState;
               }
               const newState: State = {
                 ...prevState,
-                status: "unfollowing",
+                status: 'unfollowing',
                 percentage: 0,
                 unfollowLog: [],
                 filter: {
@@ -239,21 +239,21 @@ export const Searching = ({
             });
           }}
         >
-          Unfollow ({state.selectedResults.length})
+          Queue Unfollow ({state.selectedResults.length})
         </button>
       </aside>
-      <article className="results-container">
-        <nav className="tabs-container">
+      <article className='results-container'>
+        <nav className='tabs-container'>
           <button
-            type="button"
-            className={`tab ${state.currentTab === "non_whitelisted" ? "tab-active" : ""}`}
+            type='button'
+            className={`tab ${state.currentTab === 'non_whitelisted' ? 'tab-active' : ''}`}
             onClick={() => {
-              if (state.currentTab === "non_whitelisted") {
+              if (state.currentTab === 'non_whitelisted') {
                 return;
               }
               setState({
                 ...state,
-                currentTab: "non_whitelisted",
+                currentTab: 'non_whitelisted',
                 page: 1,
               });
             }}
@@ -261,15 +261,15 @@ export const Searching = ({
             Non-Whitelisted
           </button>
           <button
-            type="button"
-            className={`tab ${state.currentTab === "whitelisted" ? "tab-active" : ""}`}
+            type='button'
+            className={`tab ${state.currentTab === 'whitelisted' ? 'tab-active' : ''}`}
             onClick={() => {
-              if (state.currentTab === "whitelisted") {
+              if (state.currentTab === 'whitelisted') {
                 return;
               }
               setState({
                 ...state,
-                currentTab: "whitelisted",
+                currentTab: 'whitelisted',
                 page: 1,
               });
             }}
@@ -277,26 +277,26 @@ export const Searching = ({
             Whitelisted
           </button>
         </nav>
-        {getCurrentPageUnfollowers(usersForDisplay, state.page).map(user => {
+        {getCurrentPageUsers(usersForDisplay, state.page).map(user => {
           const firstLetter = user.username.substring(0, 1).toUpperCase();
           return (
             <>
               {firstLetter !== currentLetter && onNewLetter(firstLetter)}
-              <label className="result-item">
-                <div className="flex grow align-center">
+              <label className='result-item'>
+                <div className='flex grow align-center'>
                   <div
-                    className="avatar-container"
+                    className='avatar-container'
                     onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                       // Prevent selecting result when trying to add to whitelist.
                       e.preventDefault();
                       e.stopPropagation();
                       let whitelistedResults: readonly UserNode[] = [];
                       switch (state.currentTab) {
-                        case "non_whitelisted":
+                        case 'non_whitelisted':
                           whitelistedResults = [...state.whitelistedResults, user];
                           break;
 
-                        case "whitelisted":
+                        case 'whitelisted':
                           whitelistedResults = state.whitelistedResults.filter(
                             result => result.id !== user.id,
                           );
@@ -313,40 +313,40 @@ export const Searching = ({
                     }}
                   >
                     <img
-                      className="avatar"
+                      className='avatar'
                       alt={user.username}
                       src={user.profile_pic_url}
                     />
-                    <span className="avatar-icon-overlay-container">
-                      {state.currentTab === "non_whitelisted" ? (
+                    <span className='avatar-icon-overlay-container'>
+                      {state.currentTab === 'non_whitelisted' ? (
                         <UserCheckIcon />
                       ) : (
                         <UserUncheckIcon />
                       )}
                     </span>
                   </div>
-                  <div className="flex column m-medium">
+                  <div className='flex column m-medium'>
                     <a
-                      className="fs-xlarge"
-                      target="_blank"
+                      className='fs-xlarge'
+                      target='_blank'
                       href={`/${user.username}`}
-                      rel="noreferrer"
+                      rel='noreferrer'
                     >
                       {user.username}
                     </a>
-                    <span className="fs-medium">{user.full_name}</span>
+                    <span className='fs-medium'>{user.full_name}</span>
                   </div>
-                  {user.is_verified && <div className="verified-badge">✔</div>}
+                  {user.is_verified && <div className='verified-badge'>✔</div>}
                   {user.is_private && (
-                    <div className="flex justify-center w-100">
-                      <span className="private-indicator">Private</span>
+                    <div className='flex justify-center w-100'>
+                      <span className='private-indicator'>Private</span>
                     </div>
                   )}
                 </div>
-                <div className="flex align-center gap-small">
+                <div className='flex align-center gap-small'>
                   <input
-                    className="account-checkbox"
-                    type="checkbox"
+                    className='account-checkbox'
+                    type='checkbox'
                     checked={state.selectedResults.indexOf(user) !== -1}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => toggleUser(e.currentTarget.checked, user)}
                   />
