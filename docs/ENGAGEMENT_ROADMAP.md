@@ -141,3 +141,9 @@ Ilk PR kucuk kalmali:
 - UI'da yeni tab basliklarini feature flag ile goster.
 
 Bu PR mevcut unfollower davranisini bozmadan yeni mimarinin temelini atar.
+
+## Dagitim ve test
+
+Console'a kod yapistirma akisini kaldirmak icin ana hedef Chrome extension olmalidir. Testler de gercek Instagram hesabina bagimli olmadan fixture, mock API ve local preview uzerinden yurutulmelidir.
+
+Detayli kararlar icin: [DELIVERY_AND_TESTING.md](DELIVERY_AND_TESTING.md).
