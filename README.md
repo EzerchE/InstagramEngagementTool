@@ -81,6 +81,13 @@ For Android users who want to use it on mobile:
 - After modifying `main.tsx`, run the "build" command to format, compress, and convert your code
 - Automatic re-building can be done using nodemon build-dev
 
+## 🧭 Fork Roadmap
+
+This fork is being explored as a broader engagement intelligence tool, including post-like activity,
+story-view signals, mute candidates, and top supporter ranking.
+
+See [docs/ENGAGEMENT_ROADMAP.md](docs/ENGAGEMENT_ROADMAP.md) for the proposed product and technical plan.
+
 ## ⚖️ Legal & License
 
 **Disclaimer:** This tool is not affiliated, associated, authorized, endorsed by, or officially connected with Instagram.
