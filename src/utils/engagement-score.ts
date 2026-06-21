@@ -89,14 +89,13 @@ const getScore = (counts: SignalCounts, subject: EngagementSubject, window: Enga
 
 const getRecommendation = (
   counts: SignalCounts,
-  subject: EngagementSubject,
   window: EngagementSampleWindow,
 ): { readonly recommendation: EngagementRecommendation; readonly reasons: readonly string[] } => {
   const reasons: string[] = [];
   const interactions = getInteractionCount(counts);
 
-  if (counts.profileObservations > 0 && interactions === 0 && !subject.followsViewer) {
-    reasons.push('Observed profile-level interest without follow-back or content interactions.');
+  if (counts.profileObservations > 0 && interactions === 0) {
+    reasons.push('Observed profile-level interest without content interactions.');
     return { recommendation: 'possible_watcher', reasons };
   }
 
@@ -125,7 +124,7 @@ export const buildEngagementProfile = (
   window: EngagementSampleWindow,
 ): EngagementProfile => {
   const counts = countSignals(subject, signals);
-  const recommendation = getRecommendation(counts, subject, window);
+  const recommendation = getRecommendation(counts, window);
 
   return {
     ...subject,

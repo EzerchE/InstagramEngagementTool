@@ -93,6 +93,17 @@ Ilk skor motoru su onerileri uretir:
 - `possible_watcher`: profil seviyesinde ilgi sinyali var ama follow/icerik etkilesimi yok.
 - `target_watch`: belirli kullanici arastirmasi icin izlemeye alinmis hesap.
 
+## Uygulanan collector katmani
+
+Ilk uygulama, Instagram endpoint'lerini dogrudan UI'a baglamak yerine snapshot normalizer katmani ekler:
+
+- `PostEngagementSnapshot`: post like ve yorum yapanlari `post_like` / `post_comment` sinyallerine cevirir.
+- `StoryEngagementSnapshot`: story viewer ve reaction listelerini `story_view` / `story_reaction` sinyallerine cevirir.
+- `ProfileObservationSnapshot`: belirli kullanici veya profil gozlemlerini `profile_observation` sinyaline cevirir.
+- `TargetUserInvestigation`: takip etsin veya etmesin, tek bir kullanici icin elimizdeki sinyalleri confidence ile ozetler.
+
+Bu sayede kirilgan Instagram endpoint adaptörleri daha sonra degisse bile skor motoru ve UI ayni `EngagementSignal` formatini kullanmaya devam eder.
+
 ## UI hedefi
 
 Mevcut tek liste yapisi su sekilde genisletilir:

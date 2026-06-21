@@ -75,11 +75,11 @@ describe('buildEngagementProfile', () => {
     expect(profile.confidence).toBe('low');
   });
 
-  it('flags profile-level interest without follow-back as a possible watcher', () => {
+  it('flags profile-level interest without content interaction as a possible watcher', () => {
     const profile = buildEngagementProfile(
       {
         ...baseSubject,
-        followsViewer: false,
+        followsViewer: true,
       },
       [signal('profile_observation', 1700000001000)],
       observedWindow,
