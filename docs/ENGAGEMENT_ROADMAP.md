@@ -72,6 +72,27 @@ Bu formulu UI'da degistirilebilir hale getirmek ikinci fazda mantikli olur.
 5. **Local history**  
    Story ve post ornekleri localStorage yerine IndexedDB'de tutulur. Boylece "son 30 gunde 8 story yayinladim, hic birini gormedi" gibi sinyaller uretilebilir.
 
+## Veri sinirlari ve yorumlama
+
+Bu arac kesin sosyal niyet okumasi yapmamali. Elimizdeki veriler yalnizca Instagram web'in gosterdigi veya bizim arac calisirken gozlemleyebildigi sinyallerdir.
+
+- Gecmis story viewer listeleri geriye donuk guvenilir sekilde kurulamaz.
+- Story viewer/reaction analizi, sadece arac aktifken veya Instagram'in hala gosterdigi story pencerelerinde tutulabilir.
+- "Story'lerime hic bakmadi" yerine "gozlemlenen story orneklerinde view sinyali yok" denmelidir.
+- "Mute etmis" kesin etiketi yerine `possible_muted` kullanilir.
+- "Stalker" kesin etiketi yerine `possible_watcher` kullanilir; bu sinyal ancak takip etmeyen veya takip iliskisi zayif bir hesapta profil/story/post disi gozlem kanitlari varsa uretilir.
+- Takip etmeyen kullanicilar icin analiz yalnizca herkese acik profil, yorum, begeni, story viewer/reaction gibi kullanicinin hesabindan gorulebilen verilerle sinirlidir.
+- Belirli bir kullanici eklenerek yapilan arastirma, `TargetUserInvestigation` olarak ayrilir ve confidence seviyesiyle raporlanir.
+
+Ilk skor motoru su onerileri uretir:
+
+- `keep`: guclu veya tekrar eden dogrudan etkilesim.
+- `review`: aksiyon icin yeterli kanit yok.
+- `low_interest`: bazi post etkilesimi var, story sinyali zayif.
+- `possible_muted`: yeterli ornek penceresinde hic dogrudan etkilesim yok.
+- `possible_watcher`: profil seviyesinde ilgi sinyali var ama follow/icerik etkilesimi yok.
+- `target_watch`: belirli kullanici arastirmasi icin izlemeye alinmis hesap.
+
 ## UI hedefi
 
 Mevcut tek liste yapisi su sekilde genisletilir:
