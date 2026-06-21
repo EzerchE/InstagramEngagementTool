@@ -3,7 +3,7 @@ import { ScanningTab } from './scanning-tab';
 import { ScanningFilter } from './scanning-filter';
 import { UnfollowLogEntry } from './unfollow-log-entry';
 import { UnfollowFilter } from './unfollow-filter';
-import { EngagementProfile, EngagementSampleWindow } from './engagement';
+import { EngagementProfile, EngagementSampleWindow, EngagementSignal } from './engagement';
 
 interface ScanningState {
   readonly status: 'scanning';
@@ -30,6 +30,7 @@ interface EngagementState {
   readonly status: 'engagement';
   readonly searchTerm: string;
   readonly profiles: readonly EngagementProfile[];
+  readonly signals: readonly EngagementSignal[];
   readonly sampleWindow: EngagementSampleWindow;
   readonly currentTab: 'all' | 'top_supporters' | 'low_interest' | 'possible_muted' | 'possible_watchers';
 }

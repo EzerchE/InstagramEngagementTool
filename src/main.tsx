@@ -114,6 +114,7 @@ function App() {
             status: 'engagement',
             searchTerm: '',
             profiles: previewEngagement.profiles,
+            signals: previewEngagement.signals,
             sampleWindow: previewEngagement.sampleWindow,
             currentTab: 'all',
           } as State
@@ -208,6 +209,7 @@ function App() {
       status: 'engagement',
       searchTerm: '',
       profiles: preview.profiles,
+      signals: preview.signals,
       sampleWindow: preview.sampleWindow,
       currentTab: 'all',
     });

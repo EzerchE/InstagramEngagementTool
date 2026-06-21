@@ -1,4 +1,4 @@
-import { EngagementProfile, EngagementSampleWindow, EngagementSubject } from '../model/engagement';
+import { EngagementProfile, EngagementSampleWindow, EngagementSignal, EngagementSubject } from '../model/engagement';
 import { PostEngagementSnapshot, ProfileObservationSnapshot, StoryEngagementSnapshot } from '../model/engagement-source';
 import { UserNode } from '../model/user';
 import {
@@ -52,6 +52,7 @@ export const buildPreviewEngagementProfiles = (
   now = Date.now(),
 ): {
   readonly profiles: readonly EngagementProfile[];
+  readonly signals: readonly EngagementSignal[];
   readonly sampleWindow: EngagementSampleWindow;
 } => {
   const sampleWindow: EngagementSampleWindow = {
@@ -131,6 +132,7 @@ export const buildPreviewEngagementProfiles = (
 
   return {
     sampleWindow,
+    signals,
     profiles: users.map(user => buildEngagementProfile(toSubject(user), signals, sampleWindow)),
   };
 };

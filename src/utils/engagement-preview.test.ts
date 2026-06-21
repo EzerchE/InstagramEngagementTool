@@ -35,6 +35,7 @@ describe('engagement preview', () => {
 
     expect(result.sampleWindow.sampledPosts).toBe(4);
     expect(result.sampleWindow.sampledStories).toBe(4);
+    expect(result.signals.length).toBeGreaterThan(0);
     expect(result.profiles).toHaveLength(12);
     expect(result.profiles[0].score).toBeGreaterThan(result.profiles[1].score);
   });

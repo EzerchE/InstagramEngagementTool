@@ -1,6 +1,7 @@
 import {
   EngagementProfile,
   EngagementSampleWindow,
+  EngagementSignal,
   EngagementSubject,
 } from '../model/engagement';
 import {
@@ -55,6 +56,7 @@ interface ImportPayload {
 
 export interface EngagementImportResult {
   readonly profiles: readonly EngagementProfile[];
+  readonly signals: readonly EngagementSignal[];
   readonly sampleWindow: EngagementSampleWindow;
 }
 
@@ -308,6 +310,7 @@ export const buildEngagementProfilesFromImport = (
 
   return {
     sampleWindow,
+    signals,
     profiles: subjects.map(subject => buildEngagementProfile(subject, signals, sampleWindow)),
   };
 };

@@ -1719,6 +1719,49 @@ html .iu button.run-scan:hover {
     background: rgba(255, 255, 255, 0.045);
 }
 
+.iu .target-investigation-panel {
+    display: grid;
+    gap: 0.7rem;
+    border: 1px solid rgba(124, 198, 254, 0.18);
+    border-radius: 8px;
+    padding: 0.8rem;
+    background: rgba(124, 198, 254, 0.055);
+}
+
+.iu .target-investigation-panel h4,
+.iu .target-investigation-panel p {
+    margin: 0;
+}
+
+.iu .target-investigation-panel input {
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 0.65rem;
+    color: var(--text);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.iu .target-investigation-result {
+    display: grid;
+    gap: 0.45rem;
+    border-radius: 7px;
+    padding: 0.65rem;
+    background: rgba(0, 0, 0, 0.22);
+}
+
+.iu .target-investigation-result strong {
+    color: var(--amber);
+    text-transform: capitalize;
+}
+
+.iu .target-investigation-result ul {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    padding-left: 1rem;
+    color: var(--muted);
+}
+
 .iu .engagement-import-panel h4,
 .iu .engagement-import-panel p {
     margin: 0;

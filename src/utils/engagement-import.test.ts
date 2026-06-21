@@ -34,6 +34,7 @@ describe('engagement import', () => {
     const quiet = result.profiles.find(profile => profile.username === 'quiet.one');
 
     expect(result.sampleWindow.sampledPosts).toBe(3);
+    expect(result.signals).toHaveLength(3);
     expect(active?.postLikes).toBe(1);
     expect(active?.postComments).toBe(1);
     expect(active?.storyViews).toBe(1);

@@ -27,6 +27,13 @@
       "fullName": "Possible Watcher",
       "followsViewer": false,
       "followedByViewer": false
+    },
+    {
+      "userId": "5",
+      "username": "external.viewer",
+      "fullName": "External Viewer",
+      "followsViewer": false,
+      "followedByViewer": false
     }
   ],
   "posts": [
@@ -55,7 +62,8 @@
       "observedAt": 1700172800000,
       "viewedBy": [
         { "userId": "2", "username": "active.one" },
-        { "userId": "3", "username": "story.viewer" }
+        { "userId": "3", "username": "story.viewer" },
+        { "userId": "5", "username": "external.viewer" }
       ],
       "reactedBy": [
         { "userId": "2", "username": "active.one" }

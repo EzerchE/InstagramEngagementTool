@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { State } from '../model/state';
 import { getProfilesForEngagementDisplay } from '../utils/engagement-preview';
 import { buildEngagementProfilesFromImport } from '../utils/engagement-import';
+import { buildTargetUserInvestigation } from '../utils/target-investigation';
 
 interface EngagementDashboardProps {
   readonly state: State;
@@ -17,8 +18,17 @@ const recommendationLabel = {
   target_watch: 'Target watch',
 };
 
+const signalLabel = {
+  post_like: 'Post like',
+  post_comment: 'Post comment',
+  story_view: 'Story view',
+  story_reaction: 'Story reaction',
+  profile_observation: 'Profile observation',
+};
+
 export const EngagementDashboard = ({ state, setState }: EngagementDashboardProps) => {
   const [importText, setImportText] = useState('');
+  const [targetUsername, setTargetUsername] = useState('');
   const [importMessage, setImportMessage] = useState<
     { readonly type: 'success' | 'error'; readonly text: string } | null
   >(null);
@@ -42,6 +52,7 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
       setState({
         ...state,
         profiles: imported.profiles,
+        signals: imported.signals,
         sampleWindow: imported.sampleWindow,
         currentTab: 'all',
         searchTerm: '',
@@ -58,6 +69,21 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
       });
     }
   };
+  const targetProfile = state.profiles.find(
+    profile => profile.username.toLowerCase() === targetUsername.trim().toLowerCase(),
+  );
+  const targetInvestigation = targetUsername.trim() === ''
+    ? null
+    : buildTargetUserInvestigation(
+      targetUsername,
+      state.signals,
+      targetProfile === undefined
+        ? undefined
+        : {
+          followsViewer: targetProfile.followsViewer,
+          followedByViewer: targetProfile.followedByViewer,
+        },
+    );
 
   return (
     <section className='workspace-layout engagement-workspace'>
@@ -88,6 +114,34 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             <p><span>Top supporters</span><strong>{topSupporters}</strong></p>
             <p><span>Possible muted</span><strong>{possibleMuted}</strong></p>
             <p><span>Possible watchers</span><strong>{possibleWatchers}</strong></p>
+          </div>
+          <div className='target-investigation-panel'>
+            <h4>Target Check</h4>
+            <p>
+              Add a username to check whether imported observations contain interest signals.
+            </p>
+            <input
+              type='text'
+              value={targetUsername}
+              placeholder='username'
+              onChange={event => setTargetUsername(event.currentTarget.value)}
+            />
+            {targetInvestigation !== null && (
+              <div className={`target-investigation-result confidence-${targetInvestigation.confidence}`}>
+                <strong>{targetInvestigation.confidence} confidence</strong>
+                <p>{targetInvestigation.summary}</p>
+                <ul>
+                  {targetInvestigation.signals.slice(0, 5).map(signal => (
+                    <li key={`${signal.type}:${signal.sourceId}:${signal.observedAt}`}>
+                      {signalLabel[signal.type]} · {signal.sourceId}
+                    </li>
+                  ))}
+                  {targetInvestigation.signals.length === 0 && (
+                    <li>No observed imported signal yet.</li>
+                  )}
+                </ul>
+              </div>
+            )}
           </div>
           <p className='engagement-note'>
             Preview uses fixture snapshots only. It does not call Instagram endpoints or infer mute/stalk status as fact.
