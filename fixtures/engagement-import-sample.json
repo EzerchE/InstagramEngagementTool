@@ -1,0 +1,89 @@
+{
+  "subjects": [
+    {
+      "userId": "1",
+      "username": "quiet.one",
+      "fullName": "Quiet One",
+      "followsViewer": true,
+      "followedByViewer": true
+    },
+    {
+      "userId": "2",
+      "username": "active.one",
+      "fullName": "Active One",
+      "followsViewer": true,
+      "followedByViewer": true
+    },
+    {
+      "userId": "3",
+      "username": "story.viewer",
+      "fullName": "Story Viewer",
+      "followsViewer": false,
+      "followedByViewer": true
+    },
+    {
+      "userId": "4",
+      "username": "possible.watcher",
+      "fullName": "Possible Watcher",
+      "followsViewer": false,
+      "followedByViewer": false
+    }
+  ],
+  "posts": [
+    {
+      "mediaId": "sample-post-1",
+      "observedAt": 1700000000000,
+      "likedBy": [
+        { "userId": "2", "username": "active.one" }
+      ],
+      "commentedBy": [
+        { "userId": "2", "username": "active.one" }
+      ]
+    },
+    {
+      "mediaId": "sample-post-2",
+      "observedAt": 1700086400000,
+      "likedBy": [
+        { "userId": "2", "username": "active.one" }
+      ],
+      "commentedBy": []
+    }
+  ],
+  "stories": [
+    {
+      "storyId": "sample-story-1",
+      "observedAt": 1700172800000,
+      "viewedBy": [
+        { "userId": "2", "username": "active.one" },
+        { "userId": "3", "username": "story.viewer" }
+      ],
+      "reactedBy": [
+        { "userId": "2", "username": "active.one" }
+      ]
+    },
+    {
+      "storyId": "sample-story-2",
+      "observedAt": 1700259200000,
+      "viewedBy": [
+        { "userId": "2", "username": "active.one" },
+        { "userId": "3", "username": "story.viewer" }
+      ],
+      "reactedBy": []
+    }
+  ],
+  "profileObservations": [
+    {
+      "sourceId": "sample-profile-window",
+      "observedAt": 1700262800000,
+      "observedUsers": [
+        { "userId": "4", "username": "possible.watcher" }
+      ]
+    }
+  ],
+  "sampleWindow": {
+    "sampledPosts": 5,
+    "sampledStories": 5,
+    "observedSince": 1700000000000,
+    "observedUntil": 1700262800000
+  }
+}

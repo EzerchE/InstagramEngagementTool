@@ -169,6 +169,7 @@ Fixture import minimum formati:
 ```
 
 Ham response testlerinde `likedByResponse`, `commentedByResponse`, `viewedByResponse` ve `reactedByResponse` alanlari da kullanilabilir.
+Hazir manuel test dosyasi: `fixtures/engagement-import-sample.json`.
 
 Test edilecek ekranlar:
 
