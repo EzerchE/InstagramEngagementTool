@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { State } from '../model/state';
 import { getProfilesForEngagementDisplay } from '../utils/engagement-preview';
+import { buildEngagementProfilesFromImport } from '../utils/engagement-import';
 
 interface EngagementDashboardProps {
   readonly state: State;
@@ -17,6 +18,11 @@ const recommendationLabel = {
 };
 
 export const EngagementDashboard = ({ state, setState }: EngagementDashboardProps) => {
+  const [importText, setImportText] = useState('');
+  const [importMessage, setImportMessage] = useState<
+    { readonly type: 'success' | 'error'; readonly text: string } | null
+  >(null);
+
   if (state.status !== 'engagement') {
     return null;
   }
@@ -30,6 +36,28 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
   const topSupporters = state.profiles.filter(profile => profile.recommendation === 'keep').length;
   const possibleMuted = state.profiles.filter(profile => profile.recommendation === 'possible_muted').length;
   const possibleWatchers = state.profiles.filter(profile => profile.recommendation === 'possible_watcher').length;
+  const importJson = (jsonText: string) => {
+    try {
+      const imported = buildEngagementProfilesFromImport(jsonText);
+      setState({
+        ...state,
+        profiles: imported.profiles,
+        sampleWindow: imported.sampleWindow,
+        currentTab: 'all',
+        searchTerm: '',
+      });
+      setImportText('');
+      setImportMessage({
+        type: 'success',
+        text: `Imported ${imported.profiles.length} profiles from fixture JSON.`,
+      });
+    } catch (error) {
+      setImportMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Import failed.',
+      });
+    }
+  };
 
   return (
     <section className='workspace-layout engagement-workspace'>
@@ -64,6 +92,47 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
           <p className='engagement-note'>
             Preview uses fixture snapshots only. It does not call Instagram endpoints or infer mute/stalk status as fact.
           </p>
+          <div className='engagement-import-panel'>
+            <h4>Fixture Import</h4>
+            <p>
+              Paste normalized snapshots or raw response pairs for posts/stories. This recalculates the dashboard locally.
+            </p>
+            <textarea
+              value={importText}
+              placeholder='{"subjects":[],"posts":[],"stories":[]}'
+              onChange={event => setImportText(event.currentTarget.value)}
+            />
+            <div className='engagement-import-actions'>
+              <button
+                type='button'
+                className='button-secondary'
+                onClick={() => importJson(importText)}
+                disabled={importText.trim() === ''}
+              >
+                Import JSON
+              </button>
+              <label className='button-secondary file-import-label'>
+                File
+                <input
+                  type='file'
+                  accept='application/json,.json'
+                  onChange={async event => {
+                    const file = event.currentTarget.files?.[0];
+                    if (file === undefined) {
+                      return;
+                    }
+                    importJson(await file.text());
+                    event.currentTarget.value = '';
+                  }}
+                />
+              </label>
+            </div>
+            {importMessage !== null && (
+              <p className={`engagement-import-message ${importMessage.type}`}>
+                {importMessage.text}
+              </p>
+            )}
+          </div>
         </div>
       </aside>
       <article className='results-container engagement-results'>

@@ -1710,6 +1710,61 @@ html .iu button.run-scan:hover {
     line-height: 1.45;
 }
 
+.iu .engagement-import-panel {
+    display: grid;
+    gap: 0.7rem;
+    border: 1px solid rgba(247, 241, 232, 0.12);
+    border-radius: 8px;
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.iu .engagement-import-panel h4,
+.iu .engagement-import-panel p {
+    margin: 0;
+}
+
+.iu .engagement-import-panel textarea {
+    min-height: 8rem;
+    resize: vertical;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 0.65rem;
+    color: var(--text);
+    background: rgba(0, 0, 0, 0.3);
+    font: 0.82rem/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.iu .engagement-import-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+}
+
+.iu .file-import-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.iu .file-import-label input {
+    display: none;
+}
+
+.iu .engagement-import-message {
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.iu .engagement-import-message.success {
+    color: #b9f4ac;
+}
+
+.iu .engagement-import-message.error {
+    color: #ffb4aa;
+}
+
 .iu .engagement-results {
     gap: 0.9rem;
 }

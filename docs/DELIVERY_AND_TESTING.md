@@ -144,6 +144,31 @@ Yaklasim:
 - `http://localhost:<port>?preview=scanning`
 - `http://localhost:<port>?preview=engagement`
 - Sahte engagement verileriyle tum tablar render edilir.
+- Engagement preview icinde JSON fixture paste/file import desteklenir.
+
+Fixture import minimum formati:
+
+```json
+{
+  "subjects": [{ "userId": "1", "username": "quiet.one", "fullName": "Quiet One" }],
+  "posts": [
+    {
+      "mediaId": "post-1",
+      "likedBy": [{ "userId": "2", "username": "active.one" }],
+      "commentedBy": []
+    }
+  ],
+  "stories": [
+    {
+      "storyId": "story-1",
+      "viewedBy": [{ "userId": "2", "username": "active.one" }],
+      "reactedBy": []
+    }
+  ]
+}
+```
+
+Ham response testlerinde `likedByResponse`, `commentedByResponse`, `viewedByResponse` ve `reactedByResponse` alanlari da kullanilabilir.
 
 Test edilecek ekranlar:
 

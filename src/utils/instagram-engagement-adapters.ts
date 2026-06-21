@@ -6,6 +6,7 @@ import {
 
 interface RawActor {
   readonly id?: unknown;
+  readonly userId?: unknown;
   readonly pk?: unknown;
   readonly user_id?: unknown;
   readonly username?: unknown;
@@ -55,7 +56,7 @@ const actorFromRaw = (raw: unknown): EngagementActor | null => {
     return actorFromRaw(nestedActor);
   }
 
-  const userId = toStringValue(actor.id ?? actor.pk ?? actor.user_id);
+  const userId = toStringValue(actor.userId ?? actor.id ?? actor.pk ?? actor.user_id);
   const username = toStringValue(actor.username);
 
   if (userId === null || username === null) {
