@@ -3,6 +3,7 @@ import { ScanningTab } from './scanning-tab';
 import { ScanningFilter } from './scanning-filter';
 import { UnfollowLogEntry } from './unfollow-log-entry';
 import { UnfollowFilter } from './unfollow-filter';
+import { EngagementProfile, EngagementSampleWindow } from './engagement';
 
 interface ScanningState {
   readonly status: 'scanning';
@@ -25,5 +26,13 @@ interface UnfollowingState {
   readonly filter: UnfollowFilter;
 }
 
+interface EngagementState {
+  readonly status: 'engagement';
+  readonly searchTerm: string;
+  readonly profiles: readonly EngagementProfile[];
+  readonly sampleWindow: EngagementSampleWindow;
+  readonly currentTab: 'all' | 'top_supporters' | 'low_interest' | 'possible_muted' | 'possible_watchers';
+}
+
 // TODO THIS TYPE OF MULTIPLE STATE NEEDS TO BE SEPARETED IN DIFFERENT FILES ASAP (Global state,unfollowing state, scanning state etc...)
-export type State = { readonly status: 'initial' } | ScanningState | UnfollowingState;
+export type State = { readonly status: 'initial' } | ScanningState | UnfollowingState | EngagementState;

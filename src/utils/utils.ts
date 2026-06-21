@@ -4,6 +4,7 @@ import { ScanningTab } from '../model/scanning-tab';
 import { ScanningFilter } from '../model/scanning-filter';
 import { UnfollowLogEntry } from '../model/unfollow-log-entry';
 import { UnfollowFilter } from '../model/unfollow-filter';
+import { EngagementProfile } from '../model/engagement';
 
 export async function copyListToClipboard(nonFollowersList: readonly UserNode[]): Promise<void> {
   const sortedList = [...nonFollowersList].sort((a, b) => (a.username > b.username ? 1 : -1));
@@ -46,6 +47,66 @@ export function exportToCSV(users: readonly UserNode[]) {
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
   link.setAttribute('download', 'engagement-guard-results.csv');
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+export async function copyEngagementProfilesToClipboard(profiles: readonly EngagementProfile[]): Promise<void> {
+  const output = profiles
+    .map(profile => `${profile.username}\t${profile.score}\t${profile.recommendation}`)
+    .join('\n');
+
+  await navigator.clipboard.writeText(output);
+  alert('Engagement list copied to clipboard.');
+}
+
+export function exportEngagementProfilesToJSON(profiles: readonly EngagementProfile[]) {
+  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(profiles, null, 2));
+  const downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute('href', dataStr);
+  downloadAnchorNode.setAttribute('download', 'engagement-guard-profiles.json');
+  document.body.appendChild(downloadAnchorNode);
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
+}
+
+export function exportEngagementProfilesToCSV(profiles: readonly EngagementProfile[]) {
+  const headers = [
+    'userId',
+    'username',
+    'fullName',
+    'score',
+    'confidence',
+    'recommendation',
+    'postLikes',
+    'postComments',
+    'storyViews',
+    'storyReactions',
+    'profileObservations',
+  ];
+  const rows = profiles.map(profile => [
+    profile.userId,
+    profile.username,
+    `"${profile.fullName.replace(/"/g, '""')}"`,
+    profile.score,
+    profile.confidence,
+    profile.recommendation,
+    profile.postLikes,
+    profile.postComments,
+    profile.storyViews,
+    profile.storyReactions,
+    profile.profileObservations,
+  ]);
+
+  const csvContent = 'data:text/csv;charset=utf-8,'
+    + headers.join(',') + '\n'
+    + rows.map(row => row.join(',')).join('\n');
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', 'engagement-guard-profiles.csv');
   document.body.appendChild(link);
   link.click();
   link.remove();

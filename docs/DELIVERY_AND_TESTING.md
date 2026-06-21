@@ -142,6 +142,7 @@ Yaklasim:
 
 - `npm run build-dev`
 - `http://localhost:<port>?preview=scanning`
+- `http://localhost:<port>?preview=engagement`
 - Sahte engagement verileriyle tum tablar render edilir.
 
 Test edilecek ekranlar:

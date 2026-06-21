@@ -20,9 +20,11 @@ import { State } from './model/state';
 import { Searching } from './components/Searching';
 import { Toolbar } from './components/Toolbar';
 import { Unfollowing } from './components/Unfollowing';
+import { EngagementDashboard } from './components/EngagementDashboard';
 import { Timings } from './model/timings';
 import { loadWhitelist, saveWhitelist, loadTimings, saveTimings } from './utils/whitelist-manager';
 import { fetchFollowingPage, unfollowUser } from './services/instagram-api';
+import { buildPreviewEngagementProfiles } from './utils/engagement-preview';
 
 const LOCAL_PREVIEW_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
 const isLocalPreview = LOCAL_PREVIEW_HOSTS.has(location.hostname);
@@ -84,9 +86,12 @@ function pauseScan() {
 
 
 function App() {
+  const previewMode = isLocalPreview ? new URLSearchParams(location.search).get('preview') : null;
+  const previewUsers = _getPreviewUsers();
+  const previewEngagement = buildPreviewEngagementProfiles(previewUsers);
   const [state, setState] = useState<State>({
     ...(
-      isLocalPreview && new URLSearchParams(location.search).get('preview') === 'scanning'
+      previewMode === 'scanning'
         ? {
           status: 'scanning',
           page: 1,
@@ -104,7 +109,15 @@ function App() {
             showWithOutProfilePicture: true,
           },
         } as State
-        : { status: 'initial' as const }
+        : previewMode === 'engagement'
+          ? {
+            status: 'engagement',
+            searchTerm: '',
+            profiles: previewEngagement.profiles,
+            sampleWindow: previewEngagement.sampleWindow,
+            currentTab: 'all',
+          } as State
+          : { status: 'initial' as const }
     ),
   });
 
@@ -137,6 +150,9 @@ function App() {
     case 'unfollowing':
       isActiveProcess = state.percentage < 100;
       break;
+    case 'engagement':
+      isActiveProcess = false;
+      break;
     default:
       assertUnreachable(state);
   }
@@ -146,16 +162,16 @@ function App() {
       return;
     }
     if (isLocalPreview) {
-      const previewUsers = _getPreviewUsers();
+      const scanningPreviewUsers = _getPreviewUsers();
       setState({
         status: 'scanning',
         page: 1,
         searchTerm: '',
         currentTab: 'non_whitelisted',
         percentage: 100,
-        results: previewUsers,
-        selectedResults: previewUsers.slice(0, 3),
-        whitelistedResults: previewUsers.slice(10, 12),
+        results: scanningPreviewUsers,
+        selectedResults: scanningPreviewUsers.slice(0, 3),
+        whitelistedResults: scanningPreviewUsers.slice(10, 12),
         filter: {
           showNonFollowers: true,
           showFollowers: false,
@@ -183,6 +199,17 @@ function App() {
         showPrivate: true,
         showWithOutProfilePicture: true,
       },
+    });
+  };
+
+  const onEngagementPreview = () => {
+    const preview = buildPreviewEngagementProfiles(_getPreviewUsers());
+    setState({
+      status: 'engagement',
+      searchTerm: '',
+      profiles: preview.profiles,
+      sampleWindow: preview.sampleWindow,
+      currentTab: 'all',
     });
   };
 
@@ -483,7 +510,7 @@ function App() {
   let markup: React.JSX.Element;
   switch (state.status) {
     case 'initial':
-      markup = <NotSearching onScan={onScan} />;
+      markup = <NotSearching onScan={onScan} onEngagementPreview={onEngagementPreview} />;
       break;
 
     case 'scanning': {
@@ -504,6 +531,13 @@ function App() {
       markup = <Unfollowing
         state={state}
         handleUnfollowFilter={handleUnfollowFilter}
+       />;
+      break;
+
+    case 'engagement':
+      markup = <EngagementDashboard
+        state={state}
+        setState={setState}
        />;
       break;
 

@@ -1700,6 +1700,111 @@ html .iu button.run-scan:hover {
     height: 1.25rem;
 }
 
+.iu .engagement-workspace .app-sidebar {
+    border-right-color: rgba(140, 207, 126, 0.22);
+}
+
+.iu .engagement-note,
+.iu .engagement-reason {
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+.iu .engagement-results {
+    gap: 0.9rem;
+}
+
+.iu .engagement-profile {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.iu .engagement-profile-main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.iu .engagement-profile-main > div {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.iu .recommendation-pill {
+    width: fit-content;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.35rem 0.65rem;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.055);
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.iu .recommendation-keep {
+    border-color: rgba(140, 207, 126, 0.45);
+    color: #b9f4ac;
+}
+
+.iu .recommendation-possible_muted,
+.iu .recommendation-low_interest {
+    border-color: rgba(224, 163, 58, 0.45);
+    color: var(--amber);
+}
+
+.iu .recommendation-possible_watcher {
+    border-color: rgba(124, 198, 254, 0.45);
+    color: #a9d8ff;
+}
+
+.iu .engagement-score {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    color: var(--amber);
+    font-weight: 800;
+}
+
+.iu .engagement-score strong {
+    font-size: 2.3rem;
+    line-height: 1;
+}
+
+.iu .engagement-metrics {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin: 0;
+}
+
+.iu .engagement-metrics div {
+    border: 1px solid rgba(247, 241, 232, 0.1);
+    border-radius: 7px;
+    padding: 0.65rem;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.iu .engagement-metrics dt {
+    color: var(--muted);
+    font-size: 0.76rem;
+}
+
+.iu .engagement-metrics dd {
+    margin: 0.2rem 0 0;
+    color: var(--text);
+    font-size: 1.05rem;
+    font-weight: 900;
+}
+
+.iu .engagement-reason {
+    grid-column: 1 / -1;
+    margin: 0;
+}
+
 .iu .unfollow-log-container {
     padding: 6rem 1.25rem 1.25rem !important;
 }

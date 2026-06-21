@@ -1,12 +1,23 @@
 import React, { ChangeEvent, useState } from 'react';
 import { State } from '../model/state';
-import { assertUnreachable, copyListToClipboard, exportToCSV, exportToJSON, getCurrentPageUsers, getUsersForDisplay } from '../utils/utils';
+import {
+  assertUnreachable,
+  copyEngagementProfilesToClipboard,
+  copyListToClipboard,
+  exportEngagementProfilesToCSV,
+  exportEngagementProfilesToJSON,
+  exportToCSV,
+  exportToJSON,
+  getCurrentPageUsers,
+  getUsersForDisplay,
+} from '../utils/utils';
 import { SettingMenu } from './SettingMenu';
 import { SettingIcon } from './icons/SettingIcon';
 import { Timings } from '../model/timings';
 import { Logo } from './icons/Logo';
 import { UserNode } from '../model/user';
 import { APP_NAME } from '../constants/constants';
+import { getProfilesForEngagementDisplay } from '../utils/engagement-preview';
 
 interface ToolBarProps {
   isActiveProcess: boolean;
@@ -33,13 +44,16 @@ export const Toolbar = ({
 }: ToolBarProps) => {
 
   const [setingMenu, setSettingMenu] = useState(false);
+  const progressWidth = state.status === 'scanning' || state.status === 'unfollowing'
+    ? state.percentage
+    : 0;
 
   return (
     <header className='app-header'>
       {isActiveProcess && (
         <div
           className='progressbar'
-          style={{ '--progress-width': `${state.status !== 'initial' ? state.percentage : 0}%` } as React.CSSProperties}
+          style={{ '--progress-width': `${progressWidth}%` } as React.CSSProperties}
         />
       )}
       <div className='app-header-content'>
@@ -59,6 +73,7 @@ export const Toolbar = ({
 
               case 'scanning':
               case 'unfollowing':
+              case 'engagement':
                 setState({
                   status: 'initial',
                 });
@@ -86,6 +101,10 @@ export const Toolbar = ({
                       state.filter,
                     ),
                   );
+                case 'engagement':
+                  return copyEngagementProfilesToClipboard(
+                    getProfilesForEngagementDisplay(state.profiles, state.currentTab, state.searchTerm),
+                  );
                 case 'initial':
                 case 'unfollowing':
                   return;
@@ -103,9 +122,13 @@ export const Toolbar = ({
             onClick={() => {
               if (state.status === 'scanning') {
                 exportToJSON(getUsersForDisplay(state.results, state.whitelistedResults, state.currentTab, state.searchTerm, state.filter));
+                return;
+              }
+              if (state.status === 'engagement') {
+                exportEngagementProfilesToJSON(getProfilesForEngagementDisplay(state.profiles, state.currentTab, state.searchTerm));
               }
             }}
-            disabled={state.status !== 'scanning'}
+            disabled={state.status !== 'scanning' && state.status !== 'engagement'}
           >
             JSON
           </button>
@@ -115,9 +138,13 @@ export const Toolbar = ({
             onClick={() => {
               if (state.status === 'scanning') {
                 exportToCSV(getUsersForDisplay(state.results, state.whitelistedResults, state.currentTab, state.searchTerm, state.filter));
+                return;
+              }
+              if (state.status === 'engagement') {
+                exportEngagementProfilesToCSV(getProfilesForEngagementDisplay(state.profiles, state.currentTab, state.searchTerm));
               }
             }}
-            disabled={state.status !== 'scanning'}
+            disabled={state.status !== 'scanning' && state.status !== 'engagement'}
           >
             CSV
           </button>
@@ -149,6 +176,11 @@ export const Toolbar = ({
                     searchTerm: e.currentTarget.value,
                   });
                 case 'unfollowing':
+                  return setState({
+                    ...state,
+                    searchTerm: e.currentTarget.value,
+                  });
+                case 'engagement':
                   return setState({
                     ...state,
                     searchTerm: e.currentTarget.value,

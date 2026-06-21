@@ -1,5 +1,5 @@
 import React from 'react';
-import { assertUnreachable, getCurrentPageUsers, getMaxPage, getUsersForDisplay, isWithoutProfilePicture } from '../utils/utils';
+import { getCurrentPageUsers, getMaxPage, getUsersForDisplay, isWithoutProfilePicture } from '../utils/utils';
 import { State } from '../model/state';
 import { UserNode } from '../model/user';
 import { WHITELISTED_RESULTS_STORAGE_KEY } from '../constants/constants';
@@ -291,19 +291,12 @@ export const Searching = ({
                       e.preventDefault();
                       e.stopPropagation();
                       let whitelistedResults: readonly UserNode[] = [];
-                      switch (state.currentTab) {
-                        case 'non_whitelisted':
-                          whitelistedResults = [...state.whitelistedResults, user];
-                          break;
-
-                        case 'whitelisted':
-                          whitelistedResults = state.whitelistedResults.filter(
-                            result => result.id !== user.id,
-                          );
-                          break;
-
-                        default:
-                          assertUnreachable(state.currentTab);
+                      if (state.currentTab === 'non_whitelisted') {
+                        whitelistedResults = [...state.whitelistedResults, user];
+                      } else {
+                        whitelistedResults = state.whitelistedResults.filter(
+                          result => result.id !== user.id,
+                        );
                       }
                       localStorage.setItem(
                         WHITELISTED_RESULTS_STORAGE_KEY,
