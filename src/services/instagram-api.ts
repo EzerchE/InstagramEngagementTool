@@ -1,4 +1,9 @@
 import { User } from '../model/user';
+import { PostEngagementSnapshot, StoryEngagementSnapshot } from '../model/engagement-source';
+import {
+  postSnapshotFromResponses,
+  storySnapshotFromResponses,
+} from '../utils/instagram-engagement-adapters';
 
 const FOLLOWING_QUERY_HASH = '3dec7e2c57367ef3da3d987d89f9dbc8';
 const INSTAGRAM_GRAPHQL_URL = 'https://www.instagram.com/graphql/query/';
@@ -9,6 +14,20 @@ interface FollowingResponse {
       readonly edge_follow: User;
     };
   };
+}
+
+export interface PostEngagementRequest {
+  readonly mediaId: string;
+  readonly likedByUrl: string;
+  readonly commentedByUrl: string;
+  readonly observedAt?: number;
+}
+
+export interface StoryEngagementRequest {
+  readonly storyId: string;
+  readonly viewedByUrl: string;
+  readonly reactedByUrl: string;
+  readonly observedAt?: number;
 }
 
 const getCookie = (name: string): string | null => {
@@ -26,6 +45,18 @@ const requireCookie = (name: string): string => {
     throw new Error(`${name} cookie is missing`);
   }
   return value;
+};
+
+const fetchInstagramJson = async (url: string): Promise<unknown> => {
+  const response = await fetch(url, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch Instagram resource: ${response.status}`);
+  }
+
+  return response.json() as Promise<unknown>;
 };
 
 export const buildFollowingPageUrl = (nextCursor?: string): string => {
@@ -46,16 +77,40 @@ export const buildFollowingPageUrl = (nextCursor?: string): string => {
 };
 
 export const fetchFollowingPage = async (nextCursor?: string): Promise<User> => {
-  const response = await fetch(buildFollowingPageUrl(nextCursor), {
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch following page: ${response.status}`);
-  }
-
-  const data = await response.json() as FollowingResponse;
+  const data = await fetchInstagramJson(buildFollowingPageUrl(nextCursor)) as FollowingResponse;
   return data.data.user.edge_follow;
+};
+
+export const fetchPostEngagementSnapshot = async (
+  request: PostEngagementRequest,
+): Promise<PostEngagementSnapshot> => {
+  const [likedByResponse, commentedByResponse] = await Promise.all([
+    fetchInstagramJson(request.likedByUrl),
+    fetchInstagramJson(request.commentedByUrl),
+  ]);
+
+  return postSnapshotFromResponses(
+    request.mediaId,
+    request.observedAt ?? Date.now(),
+    likedByResponse,
+    commentedByResponse,
+  );
+};
+
+export const fetchStoryEngagementSnapshot = async (
+  request: StoryEngagementRequest,
+): Promise<StoryEngagementSnapshot> => {
+  const [viewedByResponse, reactedByResponse] = await Promise.all([
+    fetchInstagramJson(request.viewedByUrl),
+    fetchInstagramJson(request.reactedByUrl),
+  ]);
+
+  return storySnapshotFromResponses(
+    request.storyId,
+    request.observedAt ?? Date.now(),
+    viewedByResponse,
+    reactedByResponse,
+  );
 };
 
 export const unfollowUser = async (userId: string): Promise<void> => {

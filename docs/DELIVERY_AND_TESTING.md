@@ -132,6 +132,7 @@ Ilk uygulama durumu:
 - Adapter katmani eksik `id` veya `username` iceren kayitlari sessizce eler.
 - UI ve skor motoru endpoint response'lariyla degil, normalize edilmis snapshot ve `EngagementSignal` formatlariyla calisir.
 - Kisisel hesapla smoke test, bu adapter testleri ve dry-run kilidi oturduktan sonra yapilir.
+- Read-only servisler endpoint URL'lerini su an disaridan alir; URL discovery/canli endpoint dogrulamasi kisisel hesap smoke testinden hemen once ayrica yapilir.
 
 ### 3. Local preview UI testleri
 
