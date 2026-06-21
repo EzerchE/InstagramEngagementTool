@@ -126,6 +126,13 @@ Test edilecek akislar:
 - scan pause/resume
 - retry ve hata loglama
 
+Ilk uygulama durumu:
+
+- Ham liker/commenter/viewer/reaction response'lari once fixture-backed adapter testlerinden gecer.
+- Adapter katmani eksik `id` veya `username` iceren kayitlari sessizce eler.
+- UI ve skor motoru endpoint response'lariyla degil, normalize edilmis snapshot ve `EngagementSignal` formatlariyla calisir.
+- Kisisel hesapla smoke test, bu adapter testleri ve dry-run kilidi oturduktan sonra yapilir.
+
 ### 3. Local preview UI testleri
 
 Mevcut kodda `localhost` preview destegi var. Bunu koruyup genisletecegiz.
