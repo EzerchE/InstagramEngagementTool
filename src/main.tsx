@@ -12,9 +12,8 @@ import { DEFAULT_TIME_BETWEEN_SEARCH_CYCLES,
   DEFAULT_TIME_TO_WAIT_AFTER_FIVE_UNFOLLOWS, INSTAGRAM_HOSTNAME, APP_NAME } from './constants/constants';
 import {
   assertUnreachable,
-  getCookie,
   getCurrentPageUsers,
-  getUsersForDisplay, sleep, unfollowUserUrlGenerator, urlGenerator,
+  getUsersForDisplay, sleep,
 } from './utils/utils';
 import { NotSearching } from './components/NotSearching';
 import { State } from './model/state';
@@ -23,6 +22,7 @@ import { Toolbar } from './components/Toolbar';
 import { Unfollowing } from './components/Unfollowing';
 import { Timings } from './model/timings';
 import { loadWhitelist, saveWhitelist, loadTimings, saveTimings } from './utils/whitelist-manager';
+import { fetchFollowingPage, unfollowUser } from './services/instagram-api';
 
 const LOCAL_PREVIEW_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
 const isLocalPreview = LOCAL_PREVIEW_HOSTS.has(location.hostname);
@@ -342,7 +342,7 @@ function App() {
       }
       const results = [...state.results];
       let scrollCycle = 0;
-      let url = urlGenerator();
+      let nextCursor: string | undefined;
       let hasNext = true;
       let currentFollowedUsersCount = 0;
       let totalFollowedUsersCount = -1;
@@ -350,9 +350,10 @@ function App() {
       while (hasNext) {
         let receivedData: User;
         try {
-          receivedData = (await fetch(url).then(res => res.json())).data.user.edge_follow;
+          receivedData = await fetchFollowingPage(nextCursor);
         } catch (e) {
           console.error(e);
+          await sleep(timings.timeBetweenSearchCycles);
           continue;
         }
 
@@ -361,7 +362,7 @@ function App() {
         }
 
         hasNext = receivedData.page_info.has_next_page;
-        url = urlGenerator(receivedData.page_info.end_cursor);
+        nextCursor = receivedData.page_info.end_cursor;
         currentFollowedUsersCount += receivedData.edges.length;
         receivedData.edges.forEach(x => results.push(x.node));
 
@@ -418,11 +419,6 @@ function App() {
         return;
       }
 
-      const csrftoken = getCookie('csrftoken');
-      if (csrftoken === null) {
-        throw new Error('csrftoken cookie is null');
-      }
-
       let counter = 0;
       for (const user of state.selectedResults) {
         counter += 1;
@@ -430,15 +426,7 @@ function App() {
         // Math.floor would leave progress at 99% when near completion
         const percentage = Math.round((counter / state.selectedResults.length) * 100);
         try {
-          await fetch(unfollowUserUrlGenerator(user.id), {
-            headers: {
-              'content-type': 'application/x-www-form-urlencoded',
-              'x-csrftoken': csrftoken,
-            },
-            method: 'POST',
-            mode: 'cors',
-            credentials: 'include',
-          });
+          await unfollowUser(user.id);
           setState(prevState => {
             if (prevState.status !== 'unfollowing') {
               return prevState;
