@@ -171,12 +171,14 @@ Fixture import minimum formati:
 Ham response testlerinde `likedByResponse`, `commentedByResponse`, `viewedByResponse` ve `reactedByResponse` alanlari da kullanilabilir.
 Hazir manuel test dosyasi: `fixtures/engagement-import-sample.json`.
 Target Check alaninda `active.one`, `possible.watcher` veya `external.viewer` kullanilarak sinyal ozeti denenebilir.
+Story view toplama canli hesapta geriye donuk yapilmaz; aktif story penceresinde viewer snapshot export/import edilerek veya read-only adapter ile yakalanir.
 
 Test edilecek ekranlar:
 
 - Non-followers
 - Low post engagement
 - Story ghosts
+- Non-follower watchers
 - Top supporters
 - Action queue
 - Settings

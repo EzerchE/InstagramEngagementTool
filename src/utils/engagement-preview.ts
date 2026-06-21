@@ -21,7 +21,13 @@ const toSubject = (user: UserNode): EngagementSubject => ({
 
 export const getProfilesForEngagementDisplay = (
   profiles: readonly EngagementProfile[],
-  currentTab: 'all' | 'top_supporters' | 'low_interest' | 'possible_muted' | 'possible_watchers',
+  currentTab:
+    | 'all'
+    | 'top_supporters'
+    | 'low_interest'
+    | 'possible_muted'
+    | 'possible_watchers'
+    | 'non_follower_watchers',
   searchTerm: string,
 ): readonly EngagementProfile[] => {
   const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -39,6 +45,9 @@ export const getProfilesForEngagementDisplay = (
           return profile.recommendation === 'possible_muted';
         case 'possible_watchers':
           return profile.recommendation === 'possible_watcher';
+        case 'non_follower_watchers':
+          return !profile.followsViewer
+            && profile.storyViews + profile.storyReactions + profile.postLikes + profile.postComments + profile.profileObservations > 0;
       }
     })
     .filter(profile => normalizedSearch === ''

@@ -46,6 +46,8 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
   const topSupporters = state.profiles.filter(profile => profile.recommendation === 'keep').length;
   const possibleMuted = state.profiles.filter(profile => profile.recommendation === 'possible_muted').length;
   const possibleWatchers = state.profiles.filter(profile => profile.recommendation === 'possible_watcher').length;
+  const nonFollowerWatchers = state.profiles.filter(profile => !profile.followsViewer
+    && profile.storyViews + profile.storyReactions + profile.postLikes + profile.postComments + profile.profileObservations > 0).length;
   const importJson = (jsonText: string) => {
     try {
       const imported = buildEngagementProfilesFromImport(jsonText);
@@ -114,6 +116,7 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             <p><span>Top supporters</span><strong>{topSupporters}</strong></p>
             <p><span>Possible muted</span><strong>{possibleMuted}</strong></p>
             <p><span>Possible watchers</span><strong>{possibleWatchers}</strong></p>
+            <p><span>Non-follower watchers</span><strong>{nonFollowerWatchers}</strong></p>
           </div>
           <div className='target-investigation-panel'>
             <h4>Target Check</h4>
@@ -197,6 +200,7 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             ['low_interest', 'Low interest'],
             ['possible_muted', 'Possible muted'],
             ['possible_watchers', 'Watchers'],
+            ['non_follower_watchers', 'Non-follower watchers'],
           ] as const).map(([tab, label]) => (
             <button
               key={tab}

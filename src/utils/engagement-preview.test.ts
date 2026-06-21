@@ -45,9 +45,13 @@ describe('engagement preview', () => {
     const { profiles } = buildPreviewEngagementProfiles(users, 1700000000000);
 
     const possibleMuted = getProfilesForEngagementDisplay(profiles, 'possible_muted', '');
+    const nonFollowerWatchers = getProfilesForEngagementDisplay(profiles, 'non_follower_watchers', '');
     const searched = getProfilesForEngagementDisplay(profiles, 'all', 'user.11');
 
     expect(possibleMuted.every(profile => profile.recommendation === 'possible_muted')).toBe(true);
+    expect(nonFollowerWatchers.every(profile => !profile.followsViewer)).toBe(true);
+    expect(nonFollowerWatchers.every(profile =>
+      profile.storyViews + profile.storyReactions + profile.postLikes + profile.postComments + profile.profileObservations > 0)).toBe(true);
     expect(searched).toHaveLength(1);
     expect(searched[0].username).toBe('user.11');
   });

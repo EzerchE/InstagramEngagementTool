@@ -111,6 +111,7 @@ Mevcut tek liste yapisi su sekilde genisletilir:
 - `Non-followers`: mevcut akisin iyilestirilmis hali.
 - `Low post engagement`: secilen son N post icinde begeni/yorum yapmayanlar.
 - `Story ghosts`: gozlemlenen story'lerde goruntuleme sinyali olmayanlar.
+- `Non-follower watchers`: bizi takip etmeyen ama story view/reaction, post like/comment veya profil gozlem sinyali verenler.
 - `Top supporters`: post, story ve yakinlik skoruna gore en aktif takipciler.
 - `Action queue`: unfollow, mute posts, mute stories veya sadece export secimleri.
 

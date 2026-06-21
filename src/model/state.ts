@@ -32,7 +32,13 @@ interface EngagementState {
   readonly profiles: readonly EngagementProfile[];
   readonly signals: readonly EngagementSignal[];
   readonly sampleWindow: EngagementSampleWindow;
-  readonly currentTab: 'all' | 'top_supporters' | 'low_interest' | 'possible_muted' | 'possible_watchers';
+  readonly currentTab:
+    | 'all'
+    | 'top_supporters'
+    | 'low_interest'
+    | 'possible_muted'
+    | 'possible_watchers'
+    | 'non_follower_watchers';
 }
 
 // TODO THIS TYPE OF MULTIPLE STATE NEEDS TO BE SEPARETED IN DIFFERENT FILES ASAP (Global state,unfollowing state, scanning state etc...)
