@@ -1,5 +1,6 @@
 import { User } from '../model/user';
 import { PostEngagementSnapshot, StoryEngagementSnapshot } from '../model/engagement-source';
+import { MUTATING_ACTIONS_ENABLED_STORAGE_KEY } from '../constants/constants';
 import {
   postSnapshotFromResponses,
   storySnapshotFromResponses,
@@ -114,6 +115,10 @@ export const fetchStoryEngagementSnapshot = async (
 };
 
 export const unfollowUser = async (userId: string): Promise<void> => {
+  if (localStorage.getItem(MUTATING_ACTIONS_ENABLED_STORAGE_KEY) !== 'true') {
+    throw new Error('Mutating Instagram actions are disabled by default.');
+  }
+
   const csrftoken = requireCookie('csrftoken');
   const response = await fetch(`https://www.instagram.com/web/friendships/${userId}/unfollow/`, {
     headers: {

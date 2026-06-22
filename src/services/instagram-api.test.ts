@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   fetchPostEngagementSnapshot,
   fetchStoryEngagementSnapshot,
+  unfollowUser,
 } from './instagram-api';
 
 const jsonResponse = (body: unknown, ok = true, status = 200): Response =>
@@ -13,6 +14,7 @@ const jsonResponse = (body: unknown, ok = true, status = 200): Response =>
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe('instagram-api engagement fetchers', () => {
@@ -78,5 +80,13 @@ describe('instagram-api engagement fetchers', () => {
       likedByUrl: 'https://www.instagram.com/api/media/media-1/likers/',
       commentedByUrl: 'https://www.instagram.com/api/media/media-1/comments/',
     })).rejects.toThrow('429');
+  });
+
+  it('blocks mutating unfollow actions by default', async () => {
+    vi.stubGlobal('localStorage', {
+      getItem: vi.fn(() => null),
+    });
+
+    await expect(unfollowUser('user-1')).rejects.toThrow('disabled by default');
   });
 });

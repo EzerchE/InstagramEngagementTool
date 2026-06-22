@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Engagement Guard",
+  "version": "0.1.0",
+  "description": "Read-only Instagram engagement audit overlay.",
+  "action": {
+    "default_title": "Open Engagement Guard"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.instagram.com/*"
+  ]
+}

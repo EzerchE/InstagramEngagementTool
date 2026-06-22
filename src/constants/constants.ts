@@ -3,6 +3,7 @@ export const APP_NAME = 'Engagement Guard';
 export const UNFOLLOWERS_PER_PAGE = 50;
 export const WHITELISTED_RESULTS_STORAGE_KEY = 'engagement_guard_whitelist';
 export const TIMINGS_STORAGE_KEY = 'engagement_guard_timings';
+export const MUTATING_ACTIONS_ENABLED_STORAGE_KEY = 'engagement_guard_enable_mutating_actions';
 
 // TIMINGS CONSTANTS
 export const DEFAULT_TIME_BETWEEN_SEARCH_CYCLES = 1000;

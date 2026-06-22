@@ -30,12 +30,12 @@ Riskler:
 
 Ilk extension hedefi:
 
-- `manifest.json`
-- `content-script.tsx`
-- `popup.html`
-- `popup.tsx`
+- `extension/manifest.json`
+- `extension/background.js`
+- `npm run build-extension`
 - `src/services/instagram-api.ts`
-- `src/app/App.tsx`
+
+Ilk kabuk ikon tiklamasiyla `dist.js` enjekte eder; Instagram sayfasinda otomatik calismaz.
 
 ### 2. Userscript
 
@@ -84,6 +84,8 @@ Instagram cookie'leri ve same-origin kurallari nedeniyle disaridaki bir web app,
 Bu yol, console paste bagimliligini kaldirirken mevcut kodu bir anda cope atmadan ilerletir.
 
 ## Test stratejisi
+
+Ilk gercek hesap denemesi icin read-only plan: `docs/REAL_ACCOUNT_SMOKE_TEST.md`.
 
 ### 1. Unit test
 

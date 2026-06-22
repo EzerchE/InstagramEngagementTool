@@ -7,6 +7,7 @@
     "build-dev": "webpack serve --mode development",
     "build-prod": "npm run webpack-build && webpack serve --mode production",
     "build": "npm run webpack-build",
+    "build-extension": "npm run webpack-build && node scripts/copy-extension-assets.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "test": "vitest run"
