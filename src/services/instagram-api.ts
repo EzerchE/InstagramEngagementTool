@@ -66,16 +66,32 @@ const requireCookie = (name: string): string => {
   return value;
 };
 
+const buildInstagramHeaders = (): HeadersInit => {
+  const headers: Record<string, string> = {
+    'accept': 'application/json, text/plain, */*',
+    'x-asbd-id': '129477',
+    'x-ig-app-id': '936619743392459',
+    'x-requested-with': 'XMLHttpRequest',
+  };
+  const csrftoken = getCookie('csrftoken');
+
+  if (csrftoken !== null) {
+    headers['x-csrftoken'] = csrftoken;
+  }
+
+  return headers;
+};
+
 const fetchInstagramJson = async (url: string): Promise<unknown> => {
   const response = await fetch(url, {
     credentials: 'include',
-    headers: {
-      'x-ig-app-id': '936619743392459',
-    },
+    headers: buildInstagramHeaders(),
+    referrer: location.href,
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch Instagram resource: ${response.status}`);
+    const resource = new URL(url, location.href);
+    throw new Error(`Failed to fetch Instagram resource: ${response.status} ${resource.pathname}`);
   }
 
   return response.json() as Promise<unknown>;

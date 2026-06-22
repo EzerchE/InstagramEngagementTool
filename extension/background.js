@@ -7,6 +7,7 @@ chrome.action.onClicked.addListener(async tab => {
 
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
+    world: 'MAIN',
     func: () => {
       document.documentElement.dataset.engagementGuardStartMode = 'engagement_empty';
       sessionStorage.setItem('engagement_guard_start_mode', 'engagement_empty');
@@ -15,6 +16,7 @@ chrome.action.onClicked.addListener(async tab => {
 
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
+    world: 'MAIN',
     files: ['dist.js'],
   });
 });

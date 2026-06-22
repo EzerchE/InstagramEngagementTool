@@ -21,7 +21,17 @@ afterEach(() => {
 });
 
 describe('instagram-api engagement fetchers', () => {
+  const stubBrowserGlobals = () => {
+    vi.stubGlobal('document', {
+      cookie: 'ds_user_id=viewer-1; csrftoken=csrf-1',
+    });
+    vi.stubGlobal('location', {
+      href: 'https://www.instagram.com/',
+    });
+  };
+
   it('fetches post liker and commenter resources into a snapshot', async () => {
+    stubBrowserGlobals();
     const fetchMock = vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce(jsonResponse({
         users: [{ id: '1', username: 'liker.one' }],
@@ -41,7 +51,15 @@ describe('instagram-api engagement fetchers', () => {
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
       'https://www.instagram.com/api/media/media-1/likers/',
-      expect.objectContaining({ credentials: 'include' }),
+      expect.objectContaining({
+        credentials: 'include',
+        headers: expect.objectContaining({
+          'x-csrftoken': 'csrf-1',
+          'x-ig-app-id': '936619743392459',
+          'x-requested-with': 'XMLHttpRequest',
+        }),
+        referrer: 'https://www.instagram.com/',
+      }),
     );
     expect(snapshot).toEqual({
       mediaId: 'media-1',
@@ -52,6 +70,7 @@ describe('instagram-api engagement fetchers', () => {
   });
 
   it('fetches story viewer and reaction resources into a snapshot', async () => {
+    stubBrowserGlobals();
     vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce(jsonResponse({
         viewers: [{ id: '1', username: 'viewer.one' }],
@@ -76,6 +95,7 @@ describe('instagram-api engagement fetchers', () => {
   });
 
   it('fails when an engagement resource request is rejected', async () => {
+    stubBrowserGlobals();
     vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce(jsonResponse({}, false, 429))
       .mockResolvedValueOnce(jsonResponse({ users: [] }));
@@ -88,9 +108,7 @@ describe('instagram-api engagement fetchers', () => {
   });
 
   it('builds read-only post engagement scan payload from following and media pages', async () => {
-    vi.stubGlobal('document', {
-      cookie: 'ds_user_id=viewer-1',
-    });
+    stubBrowserGlobals();
     const fetchMock = vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce(jsonResponse({
         data: {
