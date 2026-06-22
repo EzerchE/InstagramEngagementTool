@@ -77,6 +77,20 @@ const _getPreviewUsers = (): readonly UserNode[] => [
   _createPreviewUser('12', 'lowlight.club', 'Owen Voss', { isPrivate: true }),
 ];
 
+const emptyEngagementState = (): State => ({
+  status: 'engagement',
+  searchTerm: '',
+  profiles: [],
+  signals: [],
+  sampleWindow: {
+    sampledPosts: 0,
+    sampledStories: 0,
+    observedSince: null,
+    observedUntil: null,
+  },
+  currentTab: 'all',
+});
+
 // pause
 let scanningPaused = false;
 
@@ -121,6 +135,8 @@ function App() {
             sampleWindow: previewEngagement.sampleWindow,
             currentTab: 'all',
           } as State
+          : previewMode === 'engagement_empty'
+            ? emptyEngagementState()
           : { status: 'initial' as const }
     ),
   });
@@ -207,6 +223,11 @@ function App() {
   };
 
   const onEngagementPreview = () => {
+    if (!isLocalPreview) {
+      setState(emptyEngagementState());
+      return;
+    }
+
     const preview = buildPreviewEngagementProfiles(_getPreviewUsers());
     setState({
       status: 'engagement',
@@ -515,7 +536,11 @@ function App() {
   let markup: React.JSX.Element;
   switch (state.status) {
     case 'initial':
-      markup = <NotSearching onScan={onScan} onEngagementPreview={onEngagementPreview} />;
+      markup = <NotSearching
+        onScan={onScan}
+        onEngagementPreview={onEngagementPreview}
+        showFollowAudit={isLocalPreview}
+       />;
       break;
 
     case 'scanning': {

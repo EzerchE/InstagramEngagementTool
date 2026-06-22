@@ -42,6 +42,7 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
     state.currentTab,
     state.searchTerm,
   );
+  const isEmptySmokeMode = state.profiles.length === 0 && state.signals.length === 0;
 
   const topSupporters = state.profiles.filter(profile => profile.recommendation === 'keep').length;
   const possibleMuted = state.profiles.filter(profile => profile.recommendation === 'possible_muted').length;
@@ -147,7 +148,9 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             )}
           </div>
           <p className='engagement-note'>
-            Preview uses fixture snapshots only. It does not call Instagram endpoints or infer mute/stalk status as fact.
+            {isEmptySmokeMode
+              ? 'Real account smoke mode is empty until you import a fixture or story/post snapshot.'
+              : 'This dashboard uses imported or fixture snapshots. It does not infer mute/stalk status as fact.'}
           </p>
           <div className='engagement-import-panel'>
             <h4>Fixture Import</h4>
@@ -243,6 +246,15 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             <p className='engagement-reason'>{profile.reasons.join(' ')}</p>
           </article>
         ))}
+        {profilesForDisplay.length === 0 && (
+          <article className='result-item engagement-empty-state'>
+            <h2>No engagement data yet</h2>
+            <p>
+              Import a fixture JSON or a small read-only story/post snapshot to populate
+              Top supporters, Possible muted, and Non-follower watchers.
+            </p>
+          </article>
+        )}
       </article>
     </section>
   );

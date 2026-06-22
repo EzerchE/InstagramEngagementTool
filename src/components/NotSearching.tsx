@@ -3,9 +3,10 @@ import React from 'react';
 interface NotSearchingProps {
   onScan?: () => void;
   onEngagementPreview?: () => void;
+  showFollowAudit?: boolean;
 }
 
-export const NotSearching = ({ onScan, onEngagementPreview }: NotSearchingProps) => (
+export const NotSearching = ({ onScan, onEngagementPreview, showFollowAudit = true }: NotSearchingProps) => (
   <section className='launch-screen'>
     <div className='launch-copy'>
       <span className='eyebrow'>Private Instagram audit</span>
@@ -18,9 +19,11 @@ export const NotSearching = ({ onScan, onEngagementPreview }: NotSearchingProps)
         <button className='run-scan' onClick={onEngagementPreview}>
           Open Engagement Dashboard
         </button>
-        <button className='run-scan' onClick={onScan}>
-          Run Follow Audit
-        </button>
+        {showFollowAudit && (
+          <button className='run-scan' onClick={onScan}>
+            Run Follow Audit
+          </button>
+        )}
         <span className='launch-note'>Runs in this browser session only</span>
       </div>
     </div>

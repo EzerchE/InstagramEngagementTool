@@ -36,6 +36,7 @@ Ilk extension hedefi:
 - `src/services/instagram-api.ts`
 
 Ilk kabuk ikon tiklamasiyla `dist.js` enjekte eder; Instagram sayfasinda otomatik calismaz.
+Gercek Instagram'da varsayilan ekran bos `Engagement` dashboard'dur; demo veriler yalnizca localhost preview icindir.
 
 ### 2. Userscript
 

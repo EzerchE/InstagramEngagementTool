@@ -1903,6 +1903,29 @@ html .iu button.run-scan:hover {
     margin: 0;
 }
 
+.iu .engagement-empty-state {
+    display: grid !important;
+    gap: 0.75rem;
+    align-items: start;
+    padding: 1.25rem !important;
+}
+
+.iu .engagement-empty-state h2,
+.iu .engagement-empty-state p {
+    margin: 0;
+}
+
+.iu .engagement-empty-state h2 {
+    color: var(--text);
+    font-size: 1.3rem;
+}
+
+.iu .engagement-empty-state p {
+    max-width: 42rem;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
 .iu .unfollow-log-container {
     padding: 6rem 1.25rem 1.25rem !important;
 }
