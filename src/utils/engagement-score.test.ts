@@ -6,6 +6,7 @@ const baseSubject: EngagementSubject = {
   userId: 'user-1',
   username: 'quiet.signal',
   fullName: 'Quiet Signal',
+  relationshipKnown: true,
   followsViewer: true,
   followedByViewer: true,
   isPrivate: false,

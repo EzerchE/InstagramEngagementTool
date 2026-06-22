@@ -27,6 +27,7 @@ export interface EngagementSubject {
   readonly userId: string;
   readonly username: string;
   readonly fullName: string;
+  readonly relationshipKnown: boolean;
   readonly followsViewer: boolean;
   readonly followedByViewer: boolean;
   readonly isPrivate: boolean;

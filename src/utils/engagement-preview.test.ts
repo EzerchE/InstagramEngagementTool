@@ -49,7 +49,7 @@ describe('engagement preview', () => {
     const searched = getProfilesForEngagementDisplay(profiles, 'all', 'user.11');
 
     expect(possibleMuted.every(profile => profile.recommendation === 'possible_muted')).toBe(true);
-    expect(nonFollowerWatchers.every(profile => !profile.followsViewer)).toBe(true);
+    expect(nonFollowerWatchers.every(profile => profile.relationshipKnown && !profile.followsViewer)).toBe(true);
     expect(nonFollowerWatchers.every(profile =>
       profile.storyViews + profile.storyReactions + profile.postLikes + profile.postComments + profile.profileObservations > 0)).toBe(true);
     expect(searched).toHaveLength(1);

@@ -31,18 +31,19 @@ Test edilebilecekler:
 6. Instagram web acikken extension ikonuna tikla.
 7. Ilk acilan ekranin bos `Engagement` dashboard oldugunu dogrula; demo kullanicilar veya eski `Audit` ekrani acilirsa extension yeniden build/yukleme gerekir.
 8. Toplanan veriyi once fixture JSON formatina cevir veya import panelinde dene.
-9. `Non-follower watchers`, `Target Check`, `Top supporters` sonuclarini kontrol et.
+9. `Known non-followers`, `Target Check`, `Top supporters` sonuclarini kontrol et.
 10. Sonuclari kesin etiket olarak degil, `possible_*` sinyal olarak yorumla.
 
 Manuel story snapshot hizli test akisi:
 
 1. Aktif story viewer listesinden 3-10 kullanici adini kopyala.
-2. `Add Story Snapshot` alanindaki viewer kutusuna yapistir.
+2. Dashboard'daki `1. Add Story Viewers` alanindaki viewer kutusuna yapistir.
 3. Reaksiyon verenler varsa ikinci kutuya ekle.
 4. `Add Story Snapshot` butonuna bas.
-5. `Target Check` ile bu kullanicilardan birini ara.
+5. `All` listesinde kullanicilarin `Story views` sinyaliyle geldigini kontrol et.
+6. `Target Check` ile bu kullanicilardan birini ara.
 
-Not: Manuel snapshot takip iliskisini bilmez; kullanici adlari story sinyali olarak eklenir. Non-follower ayrimi icin sonraki adim takipci/takip edilen relationship importudur.
+Not: Manuel snapshot takip iliskisini bilmez; kullanici adlari story sinyali olarak eklenir. `Known non-followers` ayrimi icin sonraki adim takipci/takip edilen relationship importudur.
 
 ## Guvenlik kilitleri
 

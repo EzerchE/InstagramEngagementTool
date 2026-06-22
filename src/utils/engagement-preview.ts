@@ -13,6 +13,7 @@ const toSubject = (user: UserNode): EngagementSubject => ({
   userId: user.id,
   username: user.username,
   fullName: user.full_name,
+  relationshipKnown: true,
   followsViewer: user.follows_viewer,
   followedByViewer: user.followed_by_viewer,
   isPrivate: user.is_private,
@@ -46,7 +47,8 @@ export const getProfilesForEngagementDisplay = (
         case 'possible_watchers':
           return profile.recommendation === 'possible_watcher';
         case 'non_follower_watchers':
-          return !profile.followsViewer
+          return profile.relationshipKnown
+            && !profile.followsViewer
             && profile.storyViews + profile.storyReactions + profile.postLikes + profile.postComments + profile.profileObservations > 0;
       }
     })

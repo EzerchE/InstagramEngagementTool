@@ -51,7 +51,8 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
   const topSupporters = state.profiles.filter(profile => profile.recommendation === 'keep').length;
   const possibleMuted = state.profiles.filter(profile => profile.recommendation === 'possible_muted').length;
   const possibleWatchers = state.profiles.filter(profile => profile.recommendation === 'possible_watcher').length;
-  const nonFollowerWatchers = state.profiles.filter(profile => !profile.followsViewer
+  const nonFollowerWatchers = state.profiles.filter(profile => profile.relationshipKnown
+    && !profile.followsViewer
     && profile.storyViews + profile.storyReactions + profile.postLikes + profile.postComments + profile.profileObservations > 0).length;
   const importJson = (jsonText: string) => {
     try {
@@ -99,7 +100,7 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
     : buildTargetUserInvestigation(
       targetUsername,
       state.signals,
-      targetProfile === undefined
+      targetProfile === undefined || !targetProfile.relationshipKnown
         ? undefined
         : {
           followsViewer: targetProfile.followsViewer,
@@ -136,7 +137,7 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             <p><span>Top supporters</span><strong>{topSupporters}</strong></p>
             <p><span>Possible muted</span><strong>{possibleMuted}</strong></p>
             <p><span>Possible watchers</span><strong>{possibleWatchers}</strong></p>
-            <p><span>Non-follower watchers</span><strong>{nonFollowerWatchers}</strong></p>
+            <p><span>Known non-followers</span><strong>{nonFollowerWatchers}</strong></p>
           </div>
           <div className='target-investigation-panel'>
             <h4>Target Check</h4>
@@ -168,12 +169,15 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
           </div>
           <p className='engagement-note'>
             {isEmptySmokeMode
-              ? 'Real account smoke mode is empty until you import a fixture or story/post snapshot.'
-              : 'This dashboard uses imported or fixture snapshots. It does not infer mute/stalk status as fact.'}
+              ? 'Step 1: paste story viewers below. Step 2: use Target Check or tabs. We do not auto-read Instagram yet.'
+              : 'This dashboard uses imported/manual snapshots. Relationship unknown means we have not matched followers yet.'}
           </p>
           <div className='manual-snapshot-panel'>
-            <h4>Add Story Snapshot</h4>
-            <p>Paste usernames from one active story viewer list. Use one username per line, comma, or space.</p>
+            <h4>1. Add Story Viewers</h4>
+            <p>
+              Open your active story viewer list in Instagram, then paste visible usernames here.
+              This only records that these users viewed that story.
+            </p>
             <input
               type='text'
               value={storyId}
@@ -182,12 +186,12 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             />
             <textarea
               value={storyViewers}
-              placeholder='story viewers: username1&#10;username2'
+              placeholder='viewer usernames, for example:&#10;username1&#10;username2&#10;@username3'
               onChange={event => setStoryViewers(event.currentTarget.value)}
             />
             <textarea
               value={storyReactors}
-              placeholder='story reactions, optional'
+              placeholder='reaction usernames, optional'
               onChange={event => setStoryReactors(event.currentTarget.value)}
             />
             <button
@@ -200,9 +204,9 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             </button>
           </div>
           <div className='engagement-import-panel'>
-            <h4>Fixture Import</h4>
+            <h4>Advanced JSON Import</h4>
             <p>
-              Paste normalized snapshots or raw response pairs for posts/stories. This recalculates the dashboard locally.
+              Optional: paste a full JSON fixture for posts, comments, stories, and known relationships.
             </p>
             <textarea
               value={importText}
@@ -243,6 +247,21 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
         </div>
       </aside>
       <article className='results-container engagement-results'>
+        <section className='engagement-flow-guide'>
+          <div>
+            <span className='eyebrow'>Current test mode</span>
+            <h2>Manual story snapshot first</h2>
+            <p>
+              This screen does not scrape Instagram automatically yet. Paste story viewers from an active
+              story, then the dashboard scores only the evidence you imported.
+            </p>
+          </div>
+          <ol>
+            <li><strong>Paste viewers</strong><span>Use the left “Add Story Viewers” box.</span></li>
+            <li><strong>Review signals</strong><span>Story views appear as imported evidence.</span></li>
+            <li><strong>Match later</strong><span>Follower status stays unknown until relationship import.</span></li>
+          </ol>
+        </section>
         <nav className='tabs-container'>
           {([
             ['all', 'All'],
@@ -250,7 +269,7 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             ['low_interest', 'Low interest'],
             ['possible_muted', 'Possible muted'],
             ['possible_watchers', 'Watchers'],
-            ['non_follower_watchers', 'Non-follower watchers'],
+            ['non_follower_watchers', 'Known non-followers'],
           ] as const).map(([tab, label]) => (
             <button
               key={tab}
@@ -275,6 +294,9 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
                   {profile.username}
                 </a>
                 <span className='fs-medium'>{profile.fullName}</span>
+                {!profile.relationshipKnown && (
+                  <span className='fs-medium'>Relationship unknown</span>
+                )}
               </div>
               <span className={`recommendation-pill recommendation-${profile.recommendation}`}>
                 {recommendationLabel[profile.recommendation]}
@@ -297,8 +319,8 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
           <article className='result-item engagement-empty-state'>
             <h2>No engagement data yet</h2>
             <p>
-              Import a fixture JSON or a small read-only story/post snapshot to populate
-              Top supporters, Possible muted, and Non-follower watchers.
+              Start with the left panel: paste usernames into Add Story Viewers and click Add Story Snapshot.
+              The first result will prove the pipeline works without unfollowing or muting anyone.
             </p>
           </article>
         )}

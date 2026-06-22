@@ -81,6 +81,12 @@ const toNumberValue = (value: unknown, fallback: number): number =>
 const toBooleanValue = (value: unknown): boolean =>
   typeof value === 'boolean' ? value : false;
 
+const hasRelationshipValue = (value: Record<string, unknown>): boolean =>
+  'followsViewer' in value
+  || 'follows_viewer' in value
+  || 'followedByViewer' in value
+  || 'followed_by_viewer' in value;
+
 const actorFromUnknown = (value: unknown): EngagementActor | null => {
   if (!isRecord(value)) {
     return null;
@@ -148,6 +154,7 @@ const subjectFromUnknown = (value: unknown): EngagementSubject | null => {
     userId: actor.userId,
     username: actor.username,
     fullName: toStringValue(value.fullName ?? value.full_name) ?? actor.username,
+    relationshipKnown: hasRelationshipValue(value),
     followsViewer: toBooleanValue(value.followsViewer ?? value.follows_viewer),
     followedByViewer: toBooleanValue(value.followedByViewer ?? value.followed_by_viewer),
     isPrivate: toBooleanValue(value.isPrivate ?? value.is_private),
@@ -159,6 +166,7 @@ const subjectFromActor = (actor: EngagementActor): EngagementSubject => ({
   userId: actor.userId,
   username: actor.username,
   fullName: actor.username,
+  relationshipKnown: false,
   followsViewer: false,
   followedByViewer: false,
   isPrivate: false,
