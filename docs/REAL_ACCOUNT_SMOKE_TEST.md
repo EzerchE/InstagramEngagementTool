@@ -34,6 +34,16 @@ Test edilebilecekler:
 9. `Non-follower watchers`, `Target Check`, `Top supporters` sonuclarini kontrol et.
 10. Sonuclari kesin etiket olarak degil, `possible_*` sinyal olarak yorumla.
 
+Manuel story snapshot hizli test akisi:
+
+1. Aktif story viewer listesinden 3-10 kullanici adini kopyala.
+2. `Add Story Snapshot` alanindaki viewer kutusuna yapistir.
+3. Reaksiyon verenler varsa ikinci kutuya ekle.
+4. `Add Story Snapshot` butonuna bas.
+5. `Target Check` ile bu kullanicilardan birini ara.
+
+Not: Manuel snapshot takip iliskisini bilmez; kullanici adlari story sinyali olarak eklenir. Non-follower ayrimi icin sonraki adim takipci/takip edilen relationship importudur.
+
 ## Guvenlik kilitleri
 
 - Gercek hesap testinde action queue calistirilmaz.

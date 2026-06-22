@@ -3,6 +3,7 @@ import { State } from '../model/state';
 import { getProfilesForEngagementDisplay } from '../utils/engagement-preview';
 import { buildEngagementProfilesFromImport } from '../utils/engagement-import';
 import { buildTargetUserInvestigation } from '../utils/target-investigation';
+import { buildManualStorySnapshot } from '../utils/manual-snapshot';
 
 interface EngagementDashboardProps {
   readonly state: State;
@@ -29,6 +30,9 @@ const signalLabel = {
 export const EngagementDashboard = ({ state, setState }: EngagementDashboardProps) => {
   const [importText, setImportText] = useState('');
   const [targetUsername, setTargetUsername] = useState('');
+  const [storyId, setStoryId] = useState('');
+  const [storyViewers, setStoryViewers] = useState('');
+  const [storyReactors, setStoryReactors] = useState('');
   const [importMessage, setImportMessage] = useState<
     { readonly type: 'success' | 'error'; readonly text: string } | null
   >(null);
@@ -71,6 +75,21 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
         text: error instanceof Error ? error.message : 'Import failed.',
       });
     }
+  };
+  const importManualStorySnapshot = () => {
+    const snapshot = buildManualStorySnapshot(storyId, storyViewers, storyReactors);
+    const jsonText = JSON.stringify({
+      subjects: [
+        ...snapshot.viewedBy,
+        ...snapshot.reactedBy,
+      ],
+      stories: [snapshot],
+    });
+
+    importJson(jsonText);
+    setStoryId('');
+    setStoryViewers('');
+    setStoryReactors('');
   };
   const targetProfile = state.profiles.find(
     profile => profile.username.toLowerCase() === targetUsername.trim().toLowerCase(),
@@ -152,6 +171,34 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
               ? 'Real account smoke mode is empty until you import a fixture or story/post snapshot.'
               : 'This dashboard uses imported or fixture snapshots. It does not infer mute/stalk status as fact.'}
           </p>
+          <div className='manual-snapshot-panel'>
+            <h4>Add Story Snapshot</h4>
+            <p>Paste usernames from one active story viewer list. Use one username per line, comma, or space.</p>
+            <input
+              type='text'
+              value={storyId}
+              placeholder='story label, optional'
+              onChange={event => setStoryId(event.currentTarget.value)}
+            />
+            <textarea
+              value={storyViewers}
+              placeholder='story viewers: username1&#10;username2'
+              onChange={event => setStoryViewers(event.currentTarget.value)}
+            />
+            <textarea
+              value={storyReactors}
+              placeholder='story reactions, optional'
+              onChange={event => setStoryReactors(event.currentTarget.value)}
+            />
+            <button
+              type='button'
+              className='button-secondary'
+              onClick={importManualStorySnapshot}
+              disabled={storyViewers.trim() === '' && storyReactors.trim() === ''}
+            >
+              Add Story Snapshot
+            </button>
+          </div>
           <div className='engagement-import-panel'>
             <h4>Fixture Import</h4>
             <p>

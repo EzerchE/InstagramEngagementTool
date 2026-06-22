@@ -1701,7 +1701,12 @@ html .iu button.run-scan:hover {
 }
 
 .iu .engagement-workspace .app-sidebar {
+    width: 24rem;
     border-right-color: rgba(140, 207, 126, 0.22);
+}
+
+.iu .engagement-workspace {
+    grid-template-columns: 24rem minmax(0, 1fr);
 }
 
 .iu .engagement-note,
@@ -1710,7 +1715,9 @@ html .iu button.run-scan:hover {
     line-height: 1.45;
 }
 
-.iu .engagement-import-panel {
+.iu .manual-snapshot-panel,
+.iu .engagement-import-panel,
+.iu .target-investigation-panel {
     display: grid;
     gap: 0.7rem;
     border: 1px solid rgba(247, 241, 232, 0.12);
@@ -1720,19 +1727,23 @@ html .iu button.run-scan:hover {
 }
 
 .iu .target-investigation-panel {
-    display: grid;
-    gap: 0.7rem;
     border: 1px solid rgba(124, 198, 254, 0.18);
-    border-radius: 8px;
-    padding: 0.8rem;
     background: rgba(124, 198, 254, 0.055);
 }
 
+.iu .manual-snapshot-panel {
+    border-color: rgba(140, 207, 126, 0.24);
+    background: rgba(140, 207, 126, 0.055);
+}
+
+.iu .manual-snapshot-panel h4,
+.iu .manual-snapshot-panel p,
 .iu .target-investigation-panel h4,
 .iu .target-investigation-panel p {
     margin: 0;
 }
 
+.iu .manual-snapshot-panel input,
 .iu .target-investigation-panel input {
     border: 1px solid var(--line);
     border-radius: 7px;
@@ -1762,13 +1773,8 @@ html .iu button.run-scan:hover {
     color: var(--muted);
 }
 
-.iu .engagement-import-panel h4,
-.iu .engagement-import-panel p {
-    margin: 0;
-}
-
+.iu .manual-snapshot-panel textarea,
 .iu .engagement-import-panel textarea {
-    min-height: 8rem;
     resize: vertical;
     border: 1px solid var(--line);
     border-radius: 7px;
@@ -1776,6 +1782,19 @@ html .iu button.run-scan:hover {
     color: var(--text);
     background: rgba(0, 0, 0, 0.3);
     font: 0.82rem/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.iu .manual-snapshot-panel textarea {
+    min-height: 4.8rem;
+}
+
+.iu .engagement-import-panel h4,
+.iu .engagement-import-panel p {
+    margin: 0;
+}
+
+.iu .engagement-import-panel textarea {
+    min-height: 8rem;
 }
 
 .iu .engagement-import-actions {
@@ -1810,6 +1829,11 @@ html .iu button.run-scan:hover {
 
 .iu .engagement-results {
     gap: 0.9rem;
+}
+
+.iu .engagement-results .tabs-container {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .iu .engagement-profile {

@@ -175,6 +175,7 @@ Ham response testlerinde `likedByResponse`, `commentedByResponse`, `viewedByResp
 Hazir manuel test dosyasi: `fixtures/engagement-import-sample.json`.
 Target Check alaninda `active.one`, `possible.watcher` veya `external.viewer` kullanilarak sinyal ozeti denenebilir.
 Story view toplama canli hesapta geriye donuk yapilmaz; aktif story penceresinde viewer snapshot export/import edilerek veya read-only adapter ile yakalanir.
+Hizli gercek hesap smoke testte `Add Story Snapshot` alanina viewer kullanici adlari manuel yapistirilir.
 
 Test edilecek ekranlar:
 
