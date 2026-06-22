@@ -8,6 +8,7 @@ chrome.action.onClicked.addListener(async tab => {
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
     func: () => {
+      document.documentElement.dataset.engagementGuardStartMode = 'engagement';
       sessionStorage.setItem('engagement_guard_start_mode', 'engagement');
     },
   });

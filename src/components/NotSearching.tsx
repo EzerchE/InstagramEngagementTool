@@ -15,11 +15,11 @@ export const NotSearching = ({ onScan, onEngagementPreview }: NotSearchingProps)
         mute candidates, and top supporter ranking as the tool grows.
       </p>
       <div className='launch-actions'>
+        <button className='run-scan' onClick={onEngagementPreview}>
+          Open Engagement Dashboard
+        </button>
         <button className='run-scan' onClick={onScan}>
           Run Follow Audit
-        </button>
-        <button className='copy-list' onClick={onEngagementPreview}>
-          Preview Engagement
         </button>
         <span className='launch-note'>Runs in this browser session only</span>
       </div>

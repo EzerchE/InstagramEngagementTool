@@ -88,7 +88,8 @@ function pauseScan() {
 function App() {
   const previewMode = isLocalPreview
     ? new URLSearchParams(location.search).get('preview')
-    : sessionStorage.getItem(START_MODE_STORAGE_KEY);
+    : document.documentElement.dataset.engagementGuardStartMode
+      ?? sessionStorage.getItem(START_MODE_STORAGE_KEY);
   const previewUsers = _getPreviewUsers();
   const previewEngagement = buildPreviewEngagementProfiles(previewUsers);
   const [state, setState] = useState<State>({
