@@ -1,4 +1,5 @@
 import { User } from '../model/user';
+import { EngagementSubject } from '../model/engagement';
 import { PostEngagementSnapshot, StoryEngagementSnapshot } from '../model/engagement-source';
 import { MUTATING_ACTIONS_ENABLED_STORAGE_KEY } from '../constants/constants';
 import {
@@ -14,6 +15,23 @@ interface FollowingResponse {
     readonly user: {
       readonly edge_follow: User;
     };
+  };
+}
+
+interface OwnMediaPageResponse {
+  readonly items?: readonly unknown[];
+}
+
+export interface InstagramMediaSummary {
+  readonly mediaId: string;
+}
+
+export interface ReadOnlyPostEngagementScanPayload {
+  readonly subjects: readonly EngagementSubject[];
+  readonly posts: readonly PostEngagementSnapshot[];
+  readonly sampleWindow: {
+    readonly sampledPosts: number;
+    readonly sampledStories: number;
   };
 }
 
@@ -51,6 +69,9 @@ const requireCookie = (name: string): string => {
 const fetchInstagramJson = async (url: string): Promise<unknown> => {
   const response = await fetch(url, {
     credentials: 'include',
+    headers: {
+      'x-ig-app-id': '936619743392459',
+    },
   });
 
   if (!response.ok) {
@@ -82,6 +103,49 @@ export const fetchFollowingPage = async (nextCursor?: string): Promise<User> => 
   return data.data.user.edge_follow;
 };
 
+const userNodeToSubject = (user: User['edges'][number]['node']): EngagementSubject => ({
+  userId: user.id,
+  username: user.username,
+  fullName: user.full_name,
+  relationshipKnown: true,
+  followsViewer: user.follows_viewer,
+  followedByViewer: user.followed_by_viewer,
+  isPrivate: user.is_private,
+  isVerified: user.is_verified,
+});
+
+const mediaSummaryFromUnknown = (value: unknown): InstagramMediaSummary | null => {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return null;
+  }
+
+  const media = value as Record<string, unknown>;
+  const mediaId = media.pk ?? media.id;
+
+  if (typeof mediaId !== 'string' && typeof mediaId !== 'number') {
+    return null;
+  }
+
+  return { mediaId: String(mediaId) };
+};
+
+export const buildOwnMediaPageUrl = (count: number): string =>
+  `https://www.instagram.com/api/v1/feed/user/${requireCookie('ds_user_id')}/?count=${count}`;
+
+export const buildMediaLikersUrl = (mediaId: string): string =>
+  `https://www.instagram.com/api/v1/media/${mediaId}/likers/`;
+
+export const buildMediaCommentsUrl = (mediaId: string): string =>
+  `https://www.instagram.com/api/v1/media/${mediaId}/comments/?can_support_threading=true`;
+
+export const fetchOwnMediaPage = async (count: number): Promise<readonly InstagramMediaSummary[]> => {
+  const data = await fetchInstagramJson(buildOwnMediaPageUrl(count)) as OwnMediaPageResponse;
+
+  return (data.items ?? [])
+    .map(mediaSummaryFromUnknown)
+    .filter((media): media is InstagramMediaSummary => media !== null);
+};
+
 export const fetchPostEngagementSnapshot = async (
   request: PostEngagementRequest,
 ): Promise<PostEngagementSnapshot> => {
@@ -96,6 +160,51 @@ export const fetchPostEngagementSnapshot = async (
     likedByResponse,
     commentedByResponse,
   );
+};
+
+export const fetchReadOnlyPostEngagementScan = async (
+  options: {
+    readonly maxMedia?: number;
+    readonly maxFollowingPages?: number;
+  } = {},
+): Promise<ReadOnlyPostEngagementScanPayload> => {
+  const maxMedia = options.maxMedia ?? 6;
+  const maxFollowingPages = options.maxFollowingPages ?? 2;
+  const subjectsByUserId = new Map<string, EngagementSubject>();
+  let nextCursor: string | undefined;
+
+  for (let page = 0; page < maxFollowingPages; page += 1) {
+    const followingPage = await fetchFollowingPage(nextCursor);
+    for (const edge of followingPage.edges) {
+      subjectsByUserId.set(edge.node.id, userNodeToSubject(edge.node));
+    }
+
+    if (!followingPage.page_info.has_next_page) {
+      break;
+    }
+    nextCursor = followingPage.page_info.end_cursor;
+  }
+
+  const media = await fetchOwnMediaPage(maxMedia);
+  const selectedMedia = media.slice(0, maxMedia);
+  const posts: PostEngagementSnapshot[] = [];
+
+  for (const mediaItem of selectedMedia) {
+    posts.push(await fetchPostEngagementSnapshot({
+      mediaId: mediaItem.mediaId,
+      likedByUrl: buildMediaLikersUrl(mediaItem.mediaId),
+      commentedByUrl: buildMediaCommentsUrl(mediaItem.mediaId),
+    }));
+  }
+
+  return {
+    subjects: Array.from(subjectsByUserId.values()),
+    posts,
+    sampleWindow: {
+      sampledPosts: selectedMedia.length,
+      sampledStories: 0,
+    },
+  };
 };
 
 export const fetchStoryEngagementSnapshot = async (

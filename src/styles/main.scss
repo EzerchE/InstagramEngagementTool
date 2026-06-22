@@ -1760,6 +1760,23 @@ html .iu button.run-scan:hover {
     line-height: 1.35;
 }
 
+.iu .auto-scan-message {
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.iu .auto-scan-message.running {
+    color: var(--amber);
+}
+
+.iu .auto-scan-message.success {
+    color: #b9f4ac;
+}
+
+.iu .auto-scan-message.error {
+    color: #ffb4aa;
+}
+
 .iu .manual-snapshot-panel input,
 .iu .target-investigation-panel input {
     border: 1px solid var(--line);

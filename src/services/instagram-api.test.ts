@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  buildMediaCommentsUrl,
+  buildMediaLikersUrl,
   fetchPostEngagementSnapshot,
+  fetchReadOnlyPostEngagementScan,
   fetchStoryEngagementSnapshot,
   unfollowUser,
 } from './instagram-api';
@@ -35,9 +38,11 @@ describe('instagram-api engagement fetchers', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(fetchMock).toHaveBeenNthCalledWith(1, 'https://www.instagram.com/api/media/media-1/likers/', {
-      credentials: 'include',
-    });
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      'https://www.instagram.com/api/media/media-1/likers/',
+      expect.objectContaining({ credentials: 'include' }),
+    );
     expect(snapshot).toEqual({
       mediaId: 'media-1',
       observedAt: 1700000000000,
@@ -80,6 +85,84 @@ describe('instagram-api engagement fetchers', () => {
       likedByUrl: 'https://www.instagram.com/api/media/media-1/likers/',
       commentedByUrl: 'https://www.instagram.com/api/media/media-1/comments/',
     })).rejects.toThrow('429');
+  });
+
+  it('builds read-only post engagement scan payload from following and media pages', async () => {
+    vi.stubGlobal('document', {
+      cookie: 'ds_user_id=viewer-1',
+    });
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(jsonResponse({
+        data: {
+          user: {
+            edge_follow: {
+              count: 1,
+              page_info: { has_next_page: false, end_cursor: '' },
+              edges: [
+                {
+                  node: {
+                    id: 'subject-1',
+                    username: 'subject.one',
+                    full_name: 'Subject One',
+                    profile_pic_url: 'subject.jpg',
+                    is_private: false,
+                    is_verified: false,
+                    followed_by_viewer: true,
+                    follows_viewer: true,
+                    requested_by_viewer: false,
+                    reel: {
+                      id: 'subject-1',
+                      expiring_at: 0,
+                      has_pride_media: false,
+                      latest_reel_media: 0,
+                      seen: null,
+                      owner: {
+                        __typename: 'GraphUser',
+                        id: 'subject-1',
+                        profile_pic_url: 'subject.jpg',
+                        username: 'subject.one',
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      }))
+      .mockResolvedValueOnce(jsonResponse({
+        items: [{ pk: 'media-1' }],
+      }))
+      .mockResolvedValueOnce(jsonResponse({
+        users: [{ id: 'subject-1', username: 'subject.one' }],
+      }))
+      .mockResolvedValueOnce(jsonResponse({
+        users: [{ id: 'commenter-1', username: 'commenter.one' }],
+      }));
+
+    const payload = await fetchReadOnlyPostEngagementScan({
+      maxMedia: 1,
+      maxFollowingPages: 1,
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(payload.subjects).toHaveLength(1);
+    expect(payload.posts).toEqual([
+      {
+        mediaId: 'media-1',
+        observedAt: expect.any(Number),
+        likedBy: [{ userId: 'subject-1', username: 'subject.one' }],
+        commentedBy: [{ userId: 'commenter-1', username: 'commenter.one' }],
+      },
+    ]);
+    expect(payload.sampleWindow.sampledPosts).toBe(1);
+  });
+
+  it('builds media engagement endpoint urls', () => {
+    expect(buildMediaLikersUrl('media-1')).toBe('https://www.instagram.com/api/v1/media/media-1/likers/');
+    expect(buildMediaCommentsUrl('media-1')).toBe(
+      'https://www.instagram.com/api/v1/media/media-1/comments/?can_support_threading=true',
+    );
   });
 
   it('blocks mutating unfollow actions by default', async () => {

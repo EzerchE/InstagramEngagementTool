@@ -23,8 +23,9 @@ import { Unfollowing } from './components/Unfollowing';
 import { EngagementDashboard } from './components/EngagementDashboard';
 import { Timings } from './model/timings';
 import { loadWhitelist, saveWhitelist, loadTimings, saveTimings } from './utils/whitelist-manager';
-import { fetchFollowingPage, unfollowUser } from './services/instagram-api';
+import { fetchFollowingPage, fetchReadOnlyPostEngagementScan, unfollowUser } from './services/instagram-api';
 import { buildPreviewEngagementProfiles } from './utils/engagement-preview';
+import { buildEngagementProfilesFromImport } from './utils/engagement-import';
 
 const LOCAL_PREVIEW_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
 const isLocalPreview = LOCAL_PREVIEW_HOSTS.has(location.hostname);
@@ -236,6 +237,35 @@ function App() {
       signals: preview.signals,
       sampleWindow: preview.sampleWindow,
       currentTab: 'all',
+    });
+  };
+
+  const onReadOnlyPostEngagementScan = async () => {
+    if (isLocalPreview) {
+      const preview = buildPreviewEngagementProfiles(_getPreviewUsers());
+      setState({
+        status: 'engagement',
+        searchTerm: '',
+        profiles: preview.profiles,
+        signals: preview.signals,
+        sampleWindow: preview.sampleWindow,
+        currentTab: 'post_likes_most',
+      });
+      return;
+    }
+
+    const scanPayload = await fetchReadOnlyPostEngagementScan({
+      maxMedia: 6,
+      maxFollowingPages: 2,
+    });
+    const imported = buildEngagementProfilesFromImport(JSON.stringify(scanPayload));
+    setState({
+      status: 'engagement',
+      searchTerm: '',
+      profiles: imported.profiles,
+      signals: imported.signals,
+      sampleWindow: imported.sampleWindow,
+      currentTab: 'post_likes_most',
     });
   };
 
@@ -568,6 +598,7 @@ function App() {
       markup = <EngagementDashboard
         state={state}
         setState={setState}
+        onRunReadOnlyPostScan={onReadOnlyPostEngagementScan}
        />;
       break;
 

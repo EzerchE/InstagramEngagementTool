@@ -8,6 +8,7 @@ import { buildManualStorySnapshot } from '../utils/manual-snapshot';
 interface EngagementDashboardProps {
   readonly state: State;
   readonly setState: (state: State) => void;
+  readonly onRunReadOnlyPostScan?: () => Promise<void>;
 }
 
 const recommendationLabel = {
@@ -29,7 +30,7 @@ const signalLabel = {
   profile_observation: 'Profile observation',
 };
 
-export const EngagementDashboard = ({ state, setState }: EngagementDashboardProps) => {
+export const EngagementDashboard = ({ state, setState, onRunReadOnlyPostScan }: EngagementDashboardProps) => {
   const [importText, setImportText] = useState('');
   const [targetUsername, setTargetUsername] = useState('');
   const [storyId, setStoryId] = useState('');
@@ -38,6 +39,12 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
   const [importMessage, setImportMessage] = useState<
     { readonly type: 'success' | 'error'; readonly text: string } | null
   >(null);
+  const [autoScanMessage, setAutoScanMessage] = useState<
+    { readonly type: 'idle' | 'running' | 'success' | 'error'; readonly text: string }
+  >({
+    type: 'idle',
+    text: 'Ready for a small read-only post/reels scan.',
+  });
 
   if (state.status !== 'engagement') {
     return null;
@@ -95,6 +102,28 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
     setStoryViewers('');
     setStoryReactors('');
   };
+  const runReadOnlyPostScan = async () => {
+    if (onRunReadOnlyPostScan === undefined) {
+      return;
+    }
+
+    setAutoScanMessage({
+      type: 'running',
+      text: 'Scanning recent post/reels likes and comments read-only...',
+    });
+    try {
+      await onRunReadOnlyPostScan();
+      setAutoScanMessage({
+        type: 'success',
+        text: 'Post/reels scan finished. Ranking tabs are updated.',
+      });
+    } catch (error) {
+      setAutoScanMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Read-only scan failed.',
+      });
+    }
+  };
   const targetProfile = state.profiles.find(
     profile => profile.username.toLowerCase() === targetUsername.trim().toLowerCase(),
   );
@@ -127,6 +156,15 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
               <li>Direct message replies and unanswered threads</li>
               <li>Active story viewers and story reactions</li>
             </ul>
+            <button
+              type='button'
+              className='button-secondary'
+              disabled={autoScanMessage.type === 'running' || onRunReadOnlyPostScan === undefined}
+              onClick={runReadOnlyPostScan}
+            >
+              Run Read-only Post/Reels Scan
+            </button>
+            <p className={`auto-scan-message ${autoScanMessage.type}`}>{autoScanMessage.text}</p>
           </div>
           <div className='sidebar-summary'>
             <h4>Sample Window</h4>

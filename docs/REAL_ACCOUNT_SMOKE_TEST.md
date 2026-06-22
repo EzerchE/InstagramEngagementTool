@@ -17,21 +17,22 @@ Test edilebilecekler:
 
 - Local preview UI.
 - Fixture JSON import.
+- `Run Read-only Post/Reels Scan` ile son post/reels like-comment sinyallerini kucuk ornekle toplama.
 - Aktif story penceresinden manuel veya read-only snapshot denemesi.
 - Post liker/commenter response'larini kucuk ornekle normalize etme.
-- Target Check ve Non-follower watchers segmentlerinin dogru sinyal uretmesi.
+- Ranking tablerinin dogru sinyal uretmesi.
 
 ## Ilk gercek test kapsami
 
-1. Test edilecek hesapta yeni veya aktif bir story sec.
-2. Yalnizca viewer listesini gozlemle; aksiyon tetikleme.
-3. En fazla 1 story ve 1 post ile basla.
+1. Test edilecek hesapta Instagram web acik ve login durumda olsun.
+2. Yalnizca read-only post/reels taramasi calistir; aksiyon tetikleme.
+3. Ilk denemede varsayilan limitleri kullan: en fazla 6 medya ve 2 following sayfasi.
 4. `npm run build-extension` calistir.
 5. Chrome `chrome://extensions` ekraninda `dist/` klasorunu unpacked extension olarak yukle.
 6. Instagram web acikken extension ikonuna tikla.
 7. Ilk acilan ekranin bos `Engagement` dashboard oldugunu dogrula; demo kullanicilar veya eski `Audit` ekrani acilirsa extension yeniden build/yukleme gerekir.
-8. Toplanan veriyi once fixture JSON formatina cevir veya import panelinde dene.
-9. `Known non-followers`, `Target Check`, `Top supporters` sonuclarini kontrol et.
+8. `Automatic Scan Targets` kartinda `Run Read-only Post/Reels Scan` butonuna bas.
+9. `Most post likes`, `Least/no likes`, `Top supporters` sonuclarini kontrol et.
 10. Sonuclari kesin etiket olarak degil, `possible_*` sinyal olarak yorumla.
 
 Manuel story snapshot hizli test akisi:
@@ -58,7 +59,8 @@ Not: Manuel snapshot takip iliskisini bilmez; kullanici adlari story sinyali ola
 
 - Story viewer response'u `story_view` sinyallerine donusur.
 - Takip iliskisi bilinen non-follower story viewer hesaplari `Known non-followers` segmentinde gorunur.
-- Post/reels like, story reaction ve DM sinyalleri kendi ranking tablerinde siralanir.
+- Post/reels like-comment sinyalleri otomatik read-only scan sonrasinda kendi ranking tablerinde siralanir.
+- Story reaction ve DM sinyalleri fixture/manual import ile siralanir; otomatik collector sonraki adimdir.
 - Manuel girilen kullanici opsiyonel `Target Check` alaninda sinyal ozeti verir.
 - Hic aksiyon tetiklenmeden test tamamlanir.
 

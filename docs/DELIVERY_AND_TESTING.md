@@ -230,6 +230,7 @@ Smoke checklist:
 - Overlay render ediliyor.
 - Mevcut kullanici id/csrf okunuyor.
 - Following scan ilk sayfayi cekiyor.
+- Read-only post/reels scan son medya listesini ve liker/commenter snapshotlarini kucuk ornekle cekiyor.
 - Stop/pause calisiyor.
 - Export calisiyor.
 - Dry-run action log uretiyor.
