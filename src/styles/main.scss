@@ -1717,6 +1717,7 @@ html .iu button.run-scan:hover {
 
 .iu .manual-snapshot-panel,
 .iu .engagement-import-panel,
+.iu .scan-catalog-panel,
 .iu .target-investigation-panel {
     display: grid;
     gap: 0.7rem;
@@ -1731,6 +1732,11 @@ html .iu button.run-scan:hover {
     background: rgba(124, 198, 254, 0.055);
 }
 
+.iu .scan-catalog-panel {
+    border-color: rgba(224, 163, 58, 0.24);
+    background: rgba(224, 163, 58, 0.055);
+}
+
 .iu .manual-snapshot-panel {
     border-color: rgba(140, 207, 126, 0.24);
     background: rgba(140, 207, 126, 0.055);
@@ -1738,9 +1744,20 @@ html .iu button.run-scan:hover {
 
 .iu .manual-snapshot-panel h4,
 .iu .manual-snapshot-panel p,
+.iu .scan-catalog-panel h4,
+.iu .scan-catalog-panel p,
+.iu .scan-catalog-panel ul,
 .iu .target-investigation-panel h4,
 .iu .target-investigation-panel p {
     margin: 0;
+}
+
+.iu .scan-catalog-panel ul {
+    display: grid;
+    gap: 0.35rem;
+    padding-left: 1rem;
+    color: var(--muted);
+    line-height: 1.35;
 }
 
 .iu .manual-snapshot-panel input,
@@ -1893,7 +1910,7 @@ html .iu button.run-scan:hover {
 
 .iu .engagement-results .tabs-container {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .iu .engagement-profile {
@@ -1958,7 +1975,7 @@ html .iu button.run-scan:hover {
 .iu .engagement-metrics {
     display: grid;
     grid-column: 1 / -1;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 0.6rem;
     margin: 0;
 }
@@ -2121,6 +2138,14 @@ html .iu button.run-scan:hover {
 
     .iu .engagement-flow-guide ol {
         grid-template-columns: 1fr;
+    }
+
+    .iu .engagement-results .tabs-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .iu .engagement-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     html .iu .app-sidebar {

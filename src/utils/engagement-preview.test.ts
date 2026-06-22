@@ -44,14 +44,14 @@ describe('engagement preview', () => {
     const users = Array.from({ length: 12 }, (_, index) => user(`${index + 1}`, `user.${index + 1}`));
     const { profiles } = buildPreviewEngagementProfiles(users, 1700000000000);
 
-    const possibleMuted = getProfilesForEngagementDisplay(profiles, 'possible_muted', '');
-    const nonFollowerWatchers = getProfilesForEngagementDisplay(profiles, 'non_follower_watchers', '');
+    const leastPostLikes = getProfilesForEngagementDisplay(profiles, 'post_likes_least', '');
+    const mostDirectMessages = getProfilesForEngagementDisplay(profiles, 'direct_messages_most', '');
     const searched = getProfilesForEngagementDisplay(profiles, 'all', 'user.11');
 
-    expect(possibleMuted.every(profile => profile.recommendation === 'possible_muted')).toBe(true);
-    expect(nonFollowerWatchers.every(profile => profile.relationshipKnown && !profile.followsViewer)).toBe(true);
-    expect(nonFollowerWatchers.every(profile =>
-      profile.storyViews + profile.storyReactions + profile.postLikes + profile.postComments + profile.profileObservations > 0)).toBe(true);
+    expect(leastPostLikes[0].postLikes).toBeLessThanOrEqual(leastPostLikes[leastPostLikes.length - 1].postLikes);
+    expect(mostDirectMessages[0].directMessagesSent + mostDirectMessages[0].directMessagesReceived)
+      .toBeGreaterThanOrEqual(mostDirectMessages[mostDirectMessages.length - 1].directMessagesSent
+        + mostDirectMessages[mostDirectMessages.length - 1].directMessagesReceived);
     expect(searched).toHaveLength(1);
     expect(searched[0].username).toBe('user.11');
   });

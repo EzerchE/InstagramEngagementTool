@@ -35,10 +35,14 @@ interface EngagementState {
   readonly currentTab:
     | 'all'
     | 'top_supporters'
+    | 'post_likes_most'
+    | 'post_likes_least'
+    | 'direct_messages_most'
+    | 'direct_unanswered'
+    | 'story_reactions_most'
+    | 'story_reactions_least'
     | 'low_interest'
-    | 'possible_muted'
-    | 'possible_watchers'
-    | 'non_follower_watchers';
+    | 'known_non_followers';
 }
 
 // TODO THIS TYPE OF MULTIPLE STATE NEEDS TO BE SEPARETED IN DIFFERENT FILES ASAP (Global state,unfollowing state, scanning state etc...)

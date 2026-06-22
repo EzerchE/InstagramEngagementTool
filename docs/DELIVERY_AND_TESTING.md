@@ -167,6 +167,13 @@ Fixture import minimum formati:
       "viewedBy": [{ "userId": "2", "username": "active.one" }],
       "reactedBy": []
     }
+  ],
+  "messages": [
+    {
+      "threadId": "thread-1",
+      "sentTo": [{ "userId": "1", "username": "quiet.one" }],
+      "receivedFrom": [{ "userId": "2", "username": "active.one" }]
+    }
   ]
 }
 ```
@@ -180,9 +187,10 @@ Hizli gercek hesap smoke testte `Add Story Snapshot` alanina viewer kullanici ad
 Test edilecek ekranlar:
 
 - Non-followers
-- Low post engagement
-- Story ghosts
-- Non-follower watchers
+- Most post likes / Least or no likes
+- Most DMs / Unanswered DMs
+- Most story likes / Least or no story likes
+- Known non-followers
 - Top supporters
 - Action queue
 - Settings

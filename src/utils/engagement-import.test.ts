@@ -24,6 +24,14 @@ describe('engagement import', () => {
           reactedBy: [],
         },
       ],
+      messages: [
+        {
+          threadId: 'thread-1',
+          observedAt: 1700000001500,
+          sentTo: [{ userId: '2', username: 'quiet.one' }],
+          receivedFrom: [{ userId: '1', username: 'active.one' }],
+        },
+      ],
       sampleWindow: {
         sampledPosts: 3,
         sampledStories: 3,
@@ -34,11 +42,13 @@ describe('engagement import', () => {
     const quiet = result.profiles.find(profile => profile.username === 'quiet.one');
 
     expect(result.sampleWindow.sampledPosts).toBe(3);
-    expect(result.signals).toHaveLength(3);
+    expect(result.signals).toHaveLength(5);
     expect(active?.postLikes).toBe(1);
     expect(active?.postComments).toBe(1);
     expect(active?.storyViews).toBe(1);
-    expect(quiet?.recommendation).toBe('possible_muted');
+    expect(active?.directMessagesReceived).toBe(1);
+    expect(quiet?.unansweredMessages).toBe(1);
+    expect(quiet?.recommendation).toBe('low_interest');
   });
 
   it('accepts raw response containers and derives subjects from actors', () => {

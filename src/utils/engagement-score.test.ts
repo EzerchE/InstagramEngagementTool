@@ -102,4 +102,29 @@ describe('buildEngagementProfile', () => {
     expect(profile.storyViews).toBe(0);
     expect(profile.postLikes).toBe(1);
   });
+
+  it('tracks direct message replies and unanswered outgoing messages separately', () => {
+    const repliedProfile = buildEngagementProfile(
+      baseSubject,
+      [
+        signal('direct_message_sent', 1700000001000),
+        signal('direct_message_received', 1700000002000),
+      ],
+      observedWindow,
+    );
+    const unansweredProfile = buildEngagementProfile(
+      baseSubject,
+      [
+        signal('direct_message_sent', 1700000001000),
+        signal('direct_message_sent', 1700000003000),
+      ],
+      observedWindow,
+    );
+
+    expect(repliedProfile.directMessagesSent).toBe(1);
+    expect(repliedProfile.directMessagesReceived).toBe(1);
+    expect(repliedProfile.unansweredMessages).toBe(0);
+    expect(unansweredProfile.unansweredMessages).toBe(2);
+    expect(unansweredProfile.recommendation).toBe('low_interest');
+  });
 });

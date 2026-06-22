@@ -54,7 +54,15 @@ export function exportToCSV(users: readonly UserNode[]) {
 
 export async function copyEngagementProfilesToClipboard(profiles: readonly EngagementProfile[]): Promise<void> {
   const output = profiles
-    .map(profile => `${profile.username}\t${profile.score}\t${profile.recommendation}`)
+    .map(profile => [
+      profile.username,
+      profile.score,
+      profile.postLikes,
+      profile.storyReactions,
+      profile.directMessagesReceived,
+      profile.unansweredMessages,
+      profile.recommendation,
+    ].join('\t'))
     .join('\n');
 
   await navigator.clipboard.writeText(output);
@@ -83,6 +91,9 @@ export function exportEngagementProfilesToCSV(profiles: readonly EngagementProfi
     'postComments',
     'storyViews',
     'storyReactions',
+    'directMessagesSent',
+    'directMessagesReceived',
+    'unansweredMessages',
     'profileObservations',
   ];
   const rows = profiles.map(profile => [
@@ -96,6 +107,9 @@ export function exportEngagementProfilesToCSV(profiles: readonly EngagementProfi
     profile.postComments,
     profile.storyViews,
     profile.storyReactions,
+    profile.directMessagesSent,
+    profile.directMessagesReceived,
+    profile.unansweredMessages,
     profile.profileObservations,
   ]);
 

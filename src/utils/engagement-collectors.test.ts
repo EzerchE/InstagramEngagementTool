@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  collectDirectMessageSignals,
   collectPostEngagementSignals,
   collectProfileObservationSignals,
   collectStoryEngagementSignals,
@@ -82,6 +83,22 @@ describe('engagement collectors', () => {
         sourceId: 'manual-target-check',
         observedAt: 1700000000000,
       },
+    ]);
+  });
+
+  it('normalizes direct message directions separately', () => {
+    const signals = collectDirectMessageSignals([
+      {
+        threadId: 'thread-1',
+        observedAt: 1700000000000,
+        sentTo: [actor('1', 'sent.to')],
+        receivedFrom: [actor('2', 'reply.from')],
+      },
+    ]);
+
+    expect(signals.map(signal => signal.type)).toEqual([
+      'direct_message_sent',
+      'direct_message_received',
     ]);
   });
 });

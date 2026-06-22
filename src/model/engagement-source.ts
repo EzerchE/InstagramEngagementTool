@@ -17,6 +17,13 @@ export interface StoryEngagementSnapshot {
   readonly reactedBy: readonly EngagementActor[];
 }
 
+export interface DirectMessageSnapshot {
+  readonly threadId: string;
+  readonly observedAt: number;
+  readonly sentTo: readonly EngagementActor[];
+  readonly receivedFrom: readonly EngagementActor[];
+}
+
 export interface ProfileObservationSnapshot {
   readonly sourceId: string;
   readonly observedAt: number;

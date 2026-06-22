@@ -1,6 +1,7 @@
 import { EngagementSignal } from '../model/engagement';
 import {
   EngagementActor,
+  DirectMessageSnapshot,
   PostEngagementSnapshot,
   ProfileObservationSnapshot,
   StoryEngagementSnapshot,
@@ -69,6 +70,24 @@ export const collectStoryEngagementSignals = (
 
     for (const actor of snapshot.reactedBy) {
       signals.push(actorToSignal(actor, 'story_reaction', snapshot.storyId, snapshot.observedAt));
+    }
+  }
+
+  return dedupeEngagementSignals(signals);
+};
+
+export const collectDirectMessageSignals = (
+  snapshots: readonly DirectMessageSnapshot[],
+): readonly EngagementSignal[] => {
+  const signals: EngagementSignal[] = [];
+
+  for (const snapshot of snapshots) {
+    for (const actor of snapshot.sentTo) {
+      signals.push(actorToSignal(actor, 'direct_message_sent', snapshot.threadId, snapshot.observedAt));
+    }
+
+    for (const actor of snapshot.receivedFrom) {
+      signals.push(actorToSignal(actor, 'direct_message_received', snapshot.threadId, snapshot.observedAt));
     }
   }
 

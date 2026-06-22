@@ -12,6 +12,10 @@ interface SignalCounts {
   readonly postComments: number;
   readonly storyViews: number;
   readonly storyReactions: number;
+  readonly directMessagesSent: number;
+  readonly directMessagesReceived: number;
+  readonly lastDirectMessageSentAt: number | null;
+  readonly lastDirectMessageReceivedAt: number | null;
   readonly profileObservations: number;
   readonly lastInteractionAt: number | null;
 }
@@ -21,6 +25,10 @@ const emptyCounts: SignalCounts = {
   postComments: 0,
   storyViews: 0,
   storyReactions: 0,
+  directMessagesSent: 0,
+  directMessagesReceived: 0,
+  lastDirectMessageSentAt: null,
+  lastDirectMessageReceivedAt: null,
   profileObservations: 0,
   lastInteractionAt: null,
 };
@@ -29,7 +37,26 @@ const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
 
 const getInteractionCount = (counts: SignalCounts): number =>
-  counts.postLikes + counts.postComments + counts.storyViews + counts.storyReactions;
+  counts.postLikes
+  + counts.postComments
+  + counts.storyViews
+  + counts.storyReactions
+  + counts.directMessagesReceived;
+
+const getUnansweredMessageCount = (counts: SignalCounts): number => {
+  if (counts.directMessagesSent === 0) {
+    return 0;
+  }
+
+  if (
+    counts.lastDirectMessageSentAt !== null
+    && (counts.lastDirectMessageReceivedAt === null || counts.lastDirectMessageSentAt > counts.lastDirectMessageReceivedAt)
+  ) {
+    return Math.max(1, counts.directMessagesSent - counts.directMessagesReceived);
+  }
+
+  return Math.max(0, counts.directMessagesSent - counts.directMessagesReceived);
+};
 
 const countSignals = (subject: EngagementSubject, signals: readonly EngagementSignal[]): SignalCounts =>
   signals
@@ -46,6 +73,19 @@ const countSignals = (subject: EngagementSubject, signals: readonly EngagementSi
           return { ...counts, storyViews: counts.storyViews + 1, lastInteractionAt };
         case 'story_reaction':
           return { ...counts, storyReactions: counts.storyReactions + 1, lastInteractionAt };
+        case 'direct_message_sent':
+          return {
+            ...counts,
+            directMessagesSent: counts.directMessagesSent + 1,
+            lastDirectMessageSentAt: Math.max(counts.lastDirectMessageSentAt ?? 0, signal.observedAt),
+          };
+        case 'direct_message_received':
+          return {
+            ...counts,
+            directMessagesReceived: counts.directMessagesReceived + 1,
+            lastDirectMessageReceivedAt: Math.max(counts.lastDirectMessageReceivedAt ?? 0, signal.observedAt),
+            lastInteractionAt,
+          };
         case 'profile_observation':
           return {
             ...counts,
@@ -74,6 +114,7 @@ const getScore = (counts: SignalCounts, subject: EngagementSubject, window: Enga
   const postCommentRate = window.sampledPosts === 0 ? 0 : counts.postComments / window.sampledPosts;
   const storyViewRate = window.sampledStories === 0 ? 0 : counts.storyViews / window.sampledStories;
   const storyReactionRate = window.sampledStories === 0 ? 0 : counts.storyReactions / window.sampledStories;
+  const directMessageBoost = clamp(counts.directMessagesReceived * 8 - getUnansweredMessageCount(counts) * 3, -10, 24);
   const relationshipBoost = subject.followsViewer && subject.followedByViewer ? 5 : 0;
 
   return Math.round(clamp(
@@ -81,6 +122,7 @@ const getScore = (counts: SignalCounts, subject: EngagementSubject, window: Enga
     postCommentRate * 20 +
     storyViewRate * 30 +
     storyReactionRate * 10 +
+    directMessageBoost +
     relationshipBoost,
     0,
     100,
@@ -93,10 +135,16 @@ const getRecommendation = (
 ): { readonly recommendation: EngagementRecommendation; readonly reasons: readonly string[] } => {
   const reasons: string[] = [];
   const interactions = getInteractionCount(counts);
+  const unansweredMessages = getUnansweredMessageCount(counts);
 
   if (counts.profileObservations > 0 && interactions === 0) {
     reasons.push('Observed profile-level interest without content interactions.');
     return { recommendation: 'possible_watcher', reasons };
+  }
+
+  if (unansweredMessages > 0 && interactions === 0) {
+    reasons.push('You sent direct messages but no reply signal was observed in the imported window.');
+    return { recommendation: 'low_interest', reasons };
   }
 
   if (interactions === 0 && window.sampledPosts + window.sampledStories >= 5) {
@@ -125,6 +173,7 @@ export const buildEngagementProfile = (
 ): EngagementProfile => {
   const counts = countSignals(subject, signals);
   const recommendation = getRecommendation(counts, window);
+  const unansweredMessages = getUnansweredMessageCount(counts);
 
   return {
     ...subject,
@@ -132,6 +181,9 @@ export const buildEngagementProfile = (
     postComments: counts.postComments,
     storyViews: counts.storyViews,
     storyReactions: counts.storyReactions,
+    directMessagesSent: counts.directMessagesSent,
+    directMessagesReceived: counts.directMessagesReceived,
+    unansweredMessages,
     profileObservations: counts.profileObservations,
     sampledPosts: window.sampledPosts,
     sampledStories: window.sampledStories,

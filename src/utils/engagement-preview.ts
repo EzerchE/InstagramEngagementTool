@@ -1,8 +1,14 @@
 import { EngagementProfile, EngagementSampleWindow, EngagementSignal, EngagementSubject } from '../model/engagement';
-import { PostEngagementSnapshot, ProfileObservationSnapshot, StoryEngagementSnapshot } from '../model/engagement-source';
+import {
+  DirectMessageSnapshot,
+  PostEngagementSnapshot,
+  ProfileObservationSnapshot,
+  StoryEngagementSnapshot,
+} from '../model/engagement-source';
 import { UserNode } from '../model/user';
 import {
   collectPostEngagementSignals,
+  collectDirectMessageSignals,
   collectProfileObservationSignals,
   collectStoryEngagementSignals,
   dedupeEngagementSignals,
@@ -25,13 +31,19 @@ export const getProfilesForEngagementDisplay = (
   currentTab:
     | 'all'
     | 'top_supporters'
+    | 'post_likes_most'
+    | 'post_likes_least'
+    | 'direct_messages_most'
+    | 'direct_unanswered'
+    | 'story_reactions_most'
+    | 'story_reactions_least'
     | 'low_interest'
-    | 'possible_muted'
-    | 'possible_watchers'
-    | 'non_follower_watchers',
+    | 'known_non_followers',
   searchTerm: string,
 ): readonly EngagementProfile[] => {
   const normalizedSearch = searchTerm.trim().toLowerCase();
+  const getDirectMessageCount = (profile: EngagementProfile): number =>
+    profile.directMessagesSent + profile.directMessagesReceived;
 
   return [...profiles]
     .filter(profile => {
@@ -40,13 +52,21 @@ export const getProfilesForEngagementDisplay = (
           return true;
         case 'top_supporters':
           return profile.recommendation === 'keep';
+        case 'post_likes_most':
+          return profile.sampledPosts > 0 && profile.postLikes > 0;
+        case 'post_likes_least':
+          return profile.sampledPosts > 0;
+        case 'direct_messages_most':
+          return getDirectMessageCount(profile) > 0;
+        case 'direct_unanswered':
+          return profile.unansweredMessages > 0;
+        case 'story_reactions_most':
+          return profile.sampledStories > 0 && profile.storyReactions > 0;
+        case 'story_reactions_least':
+          return profile.sampledStories > 0;
         case 'low_interest':
           return profile.recommendation === 'low_interest' || profile.recommendation === 'review';
-        case 'possible_muted':
-          return profile.recommendation === 'possible_muted';
-        case 'possible_watchers':
-          return profile.recommendation === 'possible_watcher';
-        case 'non_follower_watchers':
+        case 'known_non_followers':
           return profile.relationshipKnown
             && !profile.followsViewer
             && profile.storyViews + profile.storyReactions + profile.postLikes + profile.postComments + profile.profileObservations > 0;
@@ -55,7 +75,31 @@ export const getProfilesForEngagementDisplay = (
     .filter(profile => normalizedSearch === ''
       || profile.username.toLowerCase().includes(normalizedSearch)
       || profile.fullName.toLowerCase().includes(normalizedSearch))
-    .sort((a, b) => b.score - a.score || a.username.localeCompare(b.username));
+    .sort((a, b) => {
+      switch (currentTab) {
+        case 'post_likes_most':
+          return b.postLikes - a.postLikes || b.postComments - a.postComments || b.score - a.score || a.username.localeCompare(b.username);
+        case 'post_likes_least':
+          return a.postLikes - b.postLikes || a.postComments - b.postComments || a.score - b.score || a.username.localeCompare(b.username);
+        case 'direct_messages_most':
+          return getDirectMessageCount(b) - getDirectMessageCount(a)
+            || b.directMessagesReceived - a.directMessagesReceived
+            || a.username.localeCompare(b.username);
+        case 'direct_unanswered':
+          return b.unansweredMessages - a.unansweredMessages
+            || b.directMessagesSent - a.directMessagesSent
+            || a.username.localeCompare(b.username);
+        case 'story_reactions_most':
+          return b.storyReactions - a.storyReactions || b.storyViews - a.storyViews || b.score - a.score || a.username.localeCompare(b.username);
+        case 'story_reactions_least':
+          return a.storyReactions - b.storyReactions || a.storyViews - b.storyViews || a.score - b.score || a.username.localeCompare(b.username);
+        case 'all':
+        case 'top_supporters':
+        case 'low_interest':
+        case 'known_non_followers':
+          return b.score - a.score || a.username.localeCompare(b.username);
+      }
+    });
 };
 
 export const buildPreviewEngagementProfiles = (
@@ -127,6 +171,21 @@ export const buildPreviewEngagementProfiles = (
     },
   ];
 
+  const directMessageSnapshots: readonly DirectMessageSnapshot[] = [
+    {
+      threadId: 'preview-dm-close-friends',
+      observedAt: now - 1000 * 60 * 60 * 18,
+      sentTo: [users[0], users[2]].filter(Boolean).map(toSubject),
+      receivedFrom: [users[0], users[0], users[2]].filter(Boolean).map(toSubject),
+    },
+    {
+      threadId: 'preview-dm-unanswered',
+      observedAt: now - 1000 * 60 * 60 * 6,
+      sentTo: [users[5], users[5], users[8]].filter(Boolean).map(toSubject),
+      receivedFrom: [],
+    },
+  ];
+
   const profileObservationSnapshots: readonly ProfileObservationSnapshot[] = [
     {
       sourceId: 'preview-profile-visit-window',
@@ -138,6 +197,7 @@ export const buildPreviewEngagementProfiles = (
   const signals = dedupeEngagementSignals([
     ...collectPostEngagementSignals(postSnapshots),
     ...collectStoryEngagementSignals(storySnapshots),
+    ...collectDirectMessageSignals(directMessageSnapshots),
     ...collectProfileObservationSignals(profileObservationSnapshots),
   ]);
 

@@ -24,6 +24,8 @@ const signalLabel = {
   post_comment: 'Post comment',
   story_view: 'Story view',
   story_reaction: 'Story reaction',
+  direct_message_sent: 'DM sent',
+  direct_message_received: 'DM reply',
   profile_observation: 'Profile observation',
 };
 
@@ -49,8 +51,9 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
   const isEmptySmokeMode = state.profiles.length === 0 && state.signals.length === 0;
 
   const topSupporters = state.profiles.filter(profile => profile.recommendation === 'keep').length;
-  const possibleMuted = state.profiles.filter(profile => profile.recommendation === 'possible_muted').length;
-  const possibleWatchers = state.profiles.filter(profile => profile.recommendation === 'possible_watcher').length;
+  const postNonLikers = state.profiles.filter(profile => profile.sampledPosts > 0 && profile.postLikes === 0).length;
+  const unansweredMessageProfiles = state.profiles.filter(profile => profile.unansweredMessages > 0).length;
+  const storyNonReactors = state.profiles.filter(profile => profile.sampledStories > 0 && profile.storyReactions === 0).length;
   const nonFollowerWatchers = state.profiles.filter(profile => profile.relationshipKnown
     && !profile.followsViewer
     && profile.storyViews + profile.storyReactions + profile.postLikes + profile.postComments + profile.profileObservations > 0).length;
@@ -116,6 +119,15 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             <span>Engagement</span>
             <strong>{state.profiles.length}</strong>
           </div>
+          <div className='scan-catalog-panel'>
+            <h4>Automatic Scan Targets</h4>
+            <p>Goal: collect these sources automatically, then rank users without username search.</p>
+            <ul>
+              <li>Post/Reels likers and commenters</li>
+              <li>Direct message replies and unanswered threads</li>
+              <li>Active story viewers and story reactions</li>
+            </ul>
+          </div>
           <div className='sidebar-summary'>
             <h4>Sample Window</h4>
             <div className='summary-grid'>
@@ -135,8 +147,9 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
           </div>
           <div className='sidebar-stats metric-stack'>
             <p><span>Top supporters</span><strong>{topSupporters}</strong></p>
-            <p><span>Possible muted</span><strong>{possibleMuted}</strong></p>
-            <p><span>Possible watchers</span><strong>{possibleWatchers}</strong></p>
+            <p><span>No post likes</span><strong>{postNonLikers}</strong></p>
+            <p><span>Unanswered DMs</span><strong>{unansweredMessageProfiles}</strong></p>
+            <p><span>No story likes</span><strong>{storyNonReactors}</strong></p>
             <p><span>Known non-followers</span><strong>{nonFollowerWatchers}</strong></p>
           </div>
           <div className='target-investigation-panel'>
@@ -169,8 +182,8 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
           </div>
           <p className='engagement-note'>
             {isEmptySmokeMode
-              ? 'Step 1: paste story viewers below. Step 2: use Target Check or tabs. We do not auto-read Instagram yet.'
-              : 'This dashboard uses imported/manual snapshots. Relationship unknown means we have not matched followers yet.'}
+              ? 'Step 1: collect or import evidence. Step 2: use ranked tabs. We do not auto-read Instagram yet.'
+              : 'Use the ranking tabs. Relationship unknown means we have not matched followers yet.'}
           </p>
           <div className='manual-snapshot-panel'>
             <h4>1. Add Story Viewers</h4>
@@ -207,6 +220,7 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             <h4>Advanced JSON Import</h4>
             <p>
               Optional: paste a full JSON fixture for posts, comments, stories, and known relationships.
+              It can also include direct message snapshots under `messages`.
             </p>
             <textarea
               value={importText}
@@ -250,26 +264,30 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
         <section className='engagement-flow-guide'>
           <div>
             <span className='eyebrow'>Current test mode</span>
-            <h2>Manual story snapshot first</h2>
+            <h2>Automatic ranking lists</h2>
             <p>
-              This screen does not scrape Instagram automatically yet. Paste story viewers from an active
-              story, then the dashboard scores only the evidence you imported.
+              The dashboard is now organized around ranked scans: post/reels likes, DMs,
+              unanswered DMs, and story reactions. Live collectors will feed these same lists.
             </p>
           </div>
           <ol>
-            <li><strong>Paste viewers</strong><span>Use the left “Add Story Viewers” box.</span></li>
-            <li><strong>Review signals</strong><span>Story views appear as imported evidence.</span></li>
-            <li><strong>Match later</strong><span>Follower status stays unknown until relationship import.</span></li>
+            <li><strong>Collect</strong><span>Read-only scan gathers visible account evidence.</span></li>
+            <li><strong>Rank</strong><span>Tabs sort strongest and weakest signals automatically.</span></li>
+            <li><strong>Act later</strong><span>Mute/unfollow stays manual until confidence is high.</span></li>
           </ol>
         </section>
         <nav className='tabs-container'>
           {([
             ['all', 'All'],
             ['top_supporters', 'Top supporters'],
+            ['post_likes_most', 'Most post likes'],
+            ['post_likes_least', 'Least/no likes'],
+            ['direct_messages_most', 'Most DMs'],
+            ['direct_unanswered', 'Unanswered DMs'],
+            ['story_reactions_most', 'Most story likes'],
+            ['story_reactions_least', 'Least/no story likes'],
             ['low_interest', 'Low interest'],
-            ['possible_muted', 'Possible muted'],
-            ['possible_watchers', 'Watchers'],
-            ['non_follower_watchers', 'Known non-followers'],
+            ['known_non_followers', 'Known non-followers'],
           ] as const).map(([tab, label]) => (
             <button
               key={tab}
@@ -311,6 +329,9 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
               <div><dt>Comments</dt><dd>{profile.postComments}</dd></div>
               <div><dt>Story views</dt><dd>{profile.storyViews}</dd></div>
               <div><dt>Story reacts</dt><dd>{profile.storyReactions}</dd></div>
+              <div><dt>DM sent</dt><dd>{profile.directMessagesSent}</dd></div>
+              <div><dt>DM replies</dt><dd>{profile.directMessagesReceived}</dd></div>
+              <div><dt>Unanswered</dt><dd>{profile.unansweredMessages}</dd></div>
             </dl>
             <p className='engagement-reason'>{profile.reasons.join(' ')}</p>
           </article>
@@ -320,7 +341,7 @@ export const EngagementDashboard = ({ state, setState }: EngagementDashboardProp
             <h2>No engagement data yet</h2>
             <p>
               Start with the left panel: paste usernames into Add Story Viewers and click Add Story Snapshot.
-              The first result will prove the pipeline works without unfollowing or muting anyone.
+              The first result will prove the ranking pipeline works without unfollowing or muting anyone.
             </p>
           </article>
         )}

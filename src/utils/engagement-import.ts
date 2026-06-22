@@ -5,12 +5,14 @@ import {
   EngagementSubject,
 } from '../model/engagement';
 import {
+  DirectMessageSnapshot,
   EngagementActor,
   PostEngagementSnapshot,
   ProfileObservationSnapshot,
   StoryEngagementSnapshot,
 } from '../model/engagement-source';
 import {
+  collectDirectMessageSignals,
   collectPostEngagementSignals,
   collectProfileObservationSignals,
   collectStoryEngagementSignals,
@@ -40,6 +42,13 @@ interface ImportStory {
   readonly reactedByResponse?: unknown;
 }
 
+interface ImportMessageThread {
+  readonly threadId?: unknown;
+  readonly observedAt?: unknown;
+  readonly sentTo?: unknown;
+  readonly receivedFrom?: unknown;
+}
+
 interface ImportProfileObservation {
   readonly sourceId?: unknown;
   readonly observedAt?: unknown;
@@ -50,6 +59,7 @@ interface ImportPayload {
   readonly subjects?: unknown;
   readonly posts?: unknown;
   readonly stories?: unknown;
+  readonly messages?: unknown;
   readonly profileObservations?: unknown;
   readonly sampleWindow?: unknown;
 }
@@ -207,6 +217,21 @@ const storyFromUnknown = (value: unknown, index: number, now: number): StoryEnga
   );
 };
 
+const messageThreadFromUnknown = (value: unknown, index: number, now: number): DirectMessageSnapshot | null => {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const thread = value as ImportMessageThread;
+
+  return {
+    threadId: toStringValue(thread.threadId) ?? `import-message-thread-${index + 1}`,
+    observedAt: toNumberValue(thread.observedAt, now),
+    sentTo: actorsFromUnknown(thread.sentTo),
+    receivedFrom: actorsFromUnknown(thread.receivedFrom),
+  };
+};
+
 const profileObservationFromUnknown = (
   value: unknown,
   index: number,
@@ -228,10 +253,12 @@ const profileObservationFromUnknown = (
 const getObservedAtValues = (
   posts: readonly PostEngagementSnapshot[],
   stories: readonly StoryEngagementSnapshot[],
+  messages: readonly DirectMessageSnapshot[],
   profileObservations: readonly ProfileObservationSnapshot[],
 ): readonly number[] => [
   ...posts.map(post => post.observedAt),
   ...stories.map(story => story.observedAt),
+  ...messages.map(message => message.observedAt),
   ...profileObservations.map(observation => observation.observedAt),
 ];
 
@@ -239,9 +266,10 @@ const buildSampleWindow = (
   payloadWindow: unknown,
   posts: readonly PostEngagementSnapshot[],
   stories: readonly StoryEngagementSnapshot[],
+  messages: readonly DirectMessageSnapshot[],
   profileObservations: readonly ProfileObservationSnapshot[],
 ): EngagementSampleWindow => {
-  const observedAtValues = getObservedAtValues(posts, stories, profileObservations);
+  const observedAtValues = getObservedAtValues(posts, stories, messages, profileObservations);
   const observedSince = observedAtValues.length === 0 ? null : Math.min(...observedAtValues);
   const observedUntil = observedAtValues.length === 0 ? null : Math.max(...observedAtValues);
 
@@ -283,6 +311,11 @@ export const buildEngagementProfilesFromImport = (
   const stories = Array.isArray(payload.stories)
     ? payload.stories.map((story, index) => storyFromUnknown(story, index, now)).filter((story): story is StoryEngagementSnapshot => story !== null)
     : [];
+  const messages = Array.isArray(payload.messages)
+    ? payload.messages
+      .map((message, index) => messageThreadFromUnknown(message, index, now))
+      .filter((message): message is DirectMessageSnapshot => message !== null)
+    : [];
   const profileObservations = Array.isArray(payload.profileObservations)
     ? payload.profileObservations
       .map((observation, index) => profileObservationFromUnknown(observation, index, now))
@@ -295,6 +328,7 @@ export const buildEngagementProfilesFromImport = (
   const signals = dedupeEngagementSignals([
     ...collectPostEngagementSignals(posts),
     ...collectStoryEngagementSignals(stories),
+    ...collectDirectMessageSignals(messages),
     ...collectProfileObservationSignals(profileObservations),
   ]);
   const subjectsByUserId = new Map<string, EngagementSubject>();
@@ -314,7 +348,7 @@ export const buildEngagementProfilesFromImport = (
     throw new Error('Import payload must include at least one subject or engagement actor.');
   }
 
-  const sampleWindow = buildSampleWindow(payload.sampleWindow, posts, stories, profileObservations);
+  const sampleWindow = buildSampleWindow(payload.sampleWindow, posts, stories, messages, profileObservations);
 
   return {
     sampleWindow,

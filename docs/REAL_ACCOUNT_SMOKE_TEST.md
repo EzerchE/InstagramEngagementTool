@@ -57,8 +57,9 @@ Not: Manuel snapshot takip iliskisini bilmez; kullanici adlari story sinyali ola
 ## Basari kriterleri
 
 - Story viewer response'u `story_view` sinyallerine donusur.
-- Non-follower story viewer hesaplari `Non-follower watchers` segmentinde gorunur.
-- Manuel girilen kullanici `Target Check` alaninda sinyal ozeti verir.
+- Takip iliskisi bilinen non-follower story viewer hesaplari `Known non-followers` segmentinde gorunur.
+- Post/reels like, story reaction ve DM sinyalleri kendi ranking tablerinde siralanir.
+- Manuel girilen kullanici opsiyonel `Target Check` alaninda sinyal ozeti verir.
 - Hic aksiyon tetiklenmeden test tamamlanir.
 
 ## Bir sonraki kod adimi

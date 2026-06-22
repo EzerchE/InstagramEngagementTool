@@ -3,6 +3,8 @@ export type EngagementSignalType =
   | 'post_comment'
   | 'story_view'
   | 'story_reaction'
+  | 'direct_message_sent'
+  | 'direct_message_received'
   | 'profile_observation';
 
 export type EngagementRecommendation =
@@ -39,6 +41,9 @@ export interface EngagementProfile extends EngagementSubject {
   readonly postComments: number;
   readonly storyViews: number;
   readonly storyReactions: number;
+  readonly directMessagesSent: number;
+  readonly directMessagesReceived: number;
+  readonly unansweredMessages: number;
   readonly profileObservations: number;
   readonly sampledPosts: number;
   readonly sampledStories: number;
