@@ -9,7 +9,7 @@ import { UserUncheckIcon } from './components/icons/UserUncheckIcon';
 import { DEFAULT_TIME_BETWEEN_SEARCH_CYCLES,
   DEFAULT_TIME_BETWEEN_UNFOLLOWS,
   DEFAULT_TIME_TO_WAIT_AFTER_FIVE_SEARCH_CYCLES,
-  DEFAULT_TIME_TO_WAIT_AFTER_FIVE_UNFOLLOWS, INSTAGRAM_HOSTNAME, APP_NAME } from './constants/constants';
+  DEFAULT_TIME_TO_WAIT_AFTER_FIVE_UNFOLLOWS, INSTAGRAM_HOSTNAME, APP_NAME, START_MODE_STORAGE_KEY } from './constants/constants';
 import {
   assertUnreachable,
   getCurrentPageUsers,
@@ -86,7 +86,9 @@ function pauseScan() {
 
 
 function App() {
-  const previewMode = isLocalPreview ? new URLSearchParams(location.search).get('preview') : null;
+  const previewMode = isLocalPreview
+    ? new URLSearchParams(location.search).get('preview')
+    : sessionStorage.getItem(START_MODE_STORAGE_KEY);
   const previewUsers = _getPreviewUsers();
   const previewEngagement = buildPreviewEngagementProfiles(previewUsers);
   const [state, setState] = useState<State>({

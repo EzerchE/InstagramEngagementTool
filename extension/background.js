@@ -7,6 +7,13 @@ chrome.action.onClicked.addListener(async tab => {
 
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
+    func: () => {
+      sessionStorage.setItem('engagement_guard_start_mode', 'engagement');
+    },
+  });
+
+  await chrome.scripting.executeScript({
+    target: { tabId: tab.id },
     files: ['dist.js'],
   });
 });

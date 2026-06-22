@@ -29,9 +29,10 @@ Test edilebilecekler:
 4. `npm run build-extension` calistir.
 5. Chrome `chrome://extensions` ekraninda `dist/` klasorunu unpacked extension olarak yukle.
 6. Instagram web acikken extension ikonuna tikla.
-7. Toplanan veriyi once fixture JSON formatina cevir veya import panelinde dene.
-8. `Non-follower watchers`, `Target Check`, `Top supporters` sonuclarini kontrol et.
-9. Sonuclari kesin etiket olarak degil, `possible_*` sinyal olarak yorumla.
+7. Ilk acilan ekranin `Engagement` dashboard oldugunu dogrula; eski `Audit` ekrani acilirsa extension yeniden build/yukleme gerekir.
+8. Toplanan veriyi once fixture JSON formatina cevir veya import panelinde dene.
+9. `Non-follower watchers`, `Target Check`, `Top supporters` sonuclarini kontrol et.
+10. Sonuclari kesin etiket olarak degil, `possible_*` sinyal olarak yorumla.
 
 ## Guvenlik kilitleri
 

@@ -16,7 +16,7 @@ export const NotSearching = ({ onScan, onEngagementPreview }: NotSearchingProps)
       </p>
       <div className='launch-actions'>
         <button className='run-scan' onClick={onScan}>
-          Run Audit
+          Run Follow Audit
         </button>
         <button className='copy-list' onClick={onEngagementPreview}>
           Preview Engagement
